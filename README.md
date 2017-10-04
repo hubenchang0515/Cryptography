@@ -81,7 +81,7 @@ sys	0m0.032s
 ```C
 void md5Init();
 ```
-Initialzation, should be invoked onece before every times;
+Initialzation, should be invoked onece every time of calculate
 
 
 ### md5Count
