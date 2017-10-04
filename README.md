@@ -35,7 +35,7 @@ int main()
 {
 	md5Init();
 	
-	FILE* fp = fopen("C++ Primer.pdf","rb");
+	FILE* fp = fopen("C++ Primer.pdf","rb"); // about 196MB
 	if(fp == NULL)
 	{
 		printf("Open file failed.\n");
