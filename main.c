@@ -32,7 +32,7 @@ int main(int argc,char* argv[])
 		}
 		totalSize += currentSize;
 		md5Tail(group,currentSize,totalSize);
-		char md5[17];
+		char md5[33];
 		md5Result(md5);
 		printf("%s : %s\n", argv[i], md5);
 		fclose(fp);

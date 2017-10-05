@@ -54,7 +54,7 @@ int main()
 	md5Init();
 	char data[64] = "Hello World";
 	md5Tail(data, 11, 11);
-	char md5[17];
+	char md5[33];
 	md5Result(md5);
 	printf("%s\n",md5);
 	return 0;
@@ -96,7 +96,7 @@ int main()
 	md5Tail(group, currentSize, totalSize);
 	fclose(fp);
 	
-	char md5[17];
+	char md5[33];
 	md5Result(md5);
 	
 	printf("%s\n",md5);
