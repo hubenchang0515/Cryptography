@@ -1,6 +1,47 @@
 # littleMD5
 MD5 in littel-endian machine
 
+## Build
+```shell
+gcc -o md5 main.c md5.c
+```
+
+## Usage
+```
+Usage : md5 <file>
+        md5 text.txt
+        md5 a.txt b.txt c.txt
+        md5 *
+```
+
+## API
+
+### md5Init
+```C
+void md5Init();
+```
+Initialzation, should be invoked onece before every times;
+
+
+### md5Count
+```C
+void md5Count(void* data);
+```
+Calculate a group (64 bytes) data
+
+### md5Tail
+```C
+void md5Tail(void* data, uint8_t currentBytes, uint64_t totalBytes);
+```
+Calculate the last group (64 bytes) data
+
+### md5Result
+```C
+void md5Result(char* result);
+```
+Return the result of md5 as hex string
+
+
 ## Demo
 
 ### Calculate the md5 of short string
@@ -74,30 +115,3 @@ sys	0m0.032s
 
 ```
 
-
-## API
-
-### md5Init
-```C
-void md5Init();
-```
-Initialzation, should be invoked onece before every times;
-
-
-### md5Count
-```C
-void md5Count(void* data);
-```
-Calculate a group (64 bytes) data
-
-### md5Tail
-```C
-void md5Tail(void* data, uint8_t currentBytes, uint64_t totalBytes);
-```
-Calculate the last group (64 bytes) data
-
-### md5Result
-```C
-void md5Result(char* result);
-```
-Return the result of md5 as hex string
