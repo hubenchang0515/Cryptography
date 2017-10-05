@@ -177,7 +177,7 @@ void md5Tail(void* data, uint8_t currentBytes, uint64_t totalBytes)
 	/* needn't one more group */
 	else
 	{
-		*(uint64_t*)(data+56) = totalBytes * 8;
+		*(uint64_t*)((uint8_t*)data+56) = totalBytes * 8;
 		md5Count(data);
 	}
 	
