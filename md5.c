@@ -52,31 +52,26 @@ static void II(uint32_t* a, uint32_t b, uint32_t c, uint32_t d,
 }
 
 
-static uint32_t A = 0;
-static uint32_t B = 0;
-static uint32_t C = 0;
-static uint32_t D = 0;
-
 
 /* Initialize */
-void md5Init()
+void md5Init(Md5State* state)
 {
-	A = magicA;
-	B = magicB;
-	C = magicC;
-	D = magicD;
+	state->A = magicA;
+	state->B = magicB;
+	state->C = magicC;
+	state->D = magicD;
 }
 
 
 /* calculate one group */
-void md5Count(void* data)
+void md5Count(Md5State* state, void* data)
 {
 	uint32_t* M = (uint32_t*)data;
 
-	uint32_t a = A;
-	uint32_t b = B;
-	uint32_t c = C;
-	uint32_t d = D;
+	uint32_t a = state->A;
+	uint32_t b = state->B;
+	uint32_t c = state->C;
+	uint32_t d = state->D;
 
 	FF(&a,b,c,d,M[0],7,0xd76aa478);
 	FF(&d,a,b,c,M[1],12,0xe8c7b756);  
@@ -146,15 +141,15 @@ void md5Count(void* data)
 	II(&c,d,a,b,M[2],15,0x2ad7d2bb);
 	II(&b,c,d,a,M[9],21,0xeb86d391);
 	
-	A += a;
-	B += b;
-	C += c;
-	D += d;
+	state->A += a;
+	state->B += b;
+	state->C += c;
+	state->D += d;
 }
 
 
 /* Fill the last group and calculate */
-void md5Tail(void* data, uint8_t currentBytes, uint64_t totalBytes)
+void md5Tail(Md5State* state, void* data, uint8_t currentBytes, uint64_t totalBytes)
 {
 	/* fill current group data by 1000... */
 	if(currentBytes != 56)
@@ -169,16 +164,16 @@ void md5Tail(void* data, uint8_t currentBytes, uint64_t totalBytes)
 	/* need one more group */
 	if(currentBytes > 56)
 	{
-		md5Count(data);
+		md5Count(state, data);
 		uint8_t oneMore[64] = {0};
 		*(uint64_t*)&oneMore[56] = totalBytes * 8;
-		md5Count(oneMore);
+		md5Count(state, oneMore);
 	}
 	/* needn't one more group */
 	else
 	{
 		*(uint64_t*)((uint8_t*)data+56) = totalBytes * 8;
-		md5Count(data);
+		md5Count(state, data);
 	}
 	
 }
@@ -186,28 +181,49 @@ void md5Tail(void* data, uint8_t currentBytes, uint64_t totalBytes)
 
 
 /* Get the result as hex string */
-void md5Result(char* result)
+void md5Result(Md5State* state, char* result)
 {
 	sprintf(result, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-					(uint8_t)A,
-					(uint8_t)(A>>8),
-					(uint8_t)(A>>16),
-					(uint8_t)(A>>24),
+					(uint8_t)state->A,
+					(uint8_t)(state->A>>8),
+					(uint8_t)(state->A>>16),
+					(uint8_t)(state->A>>24),
 	
-					(uint8_t)B,
-					(uint8_t)(B>>8),
-					(uint8_t)(B>>16),
-					(uint8_t)(B>>24),
+					(uint8_t)state->B,
+					(uint8_t)(state->B>>8),
+					(uint8_t)(state->B>>16),
+					(uint8_t)(state->B>>24),
 	
-					(uint8_t)C,
-					(uint8_t)(C>>8),
-					(uint8_t)(C>>16),
-					(uint8_t)(C>>24),
+					(uint8_t)state->C,
+					(uint8_t)(state->C>>8),
+					(uint8_t)(state->C>>16),
+					(uint8_t)(state->C>>24),
 	
-					(uint8_t)D,
-					(uint8_t)(D>>8),
-					(uint8_t)(D>>16),
-					(uint8_t)(D>>24)
+					(uint8_t)state->D,
+					(uint8_t)(state->D>>8),
+					(uint8_t)(state->D>>16),
+					(uint8_t)(state->D>>24)
 		);
 }
+
+
+/* MD5 */
+void md5(Md5Callback callback, void* param, char* result)
+{
+	Md5State state;
+	md5Init(&state);
+	int currentSize = 0;
+	uint64_t totalSize = 0;
+	uint8_t data[64];
+	while(currentSize = callback(param, data), currentSize == 64)
+	{
+		totalSize += 64;
+		md5Count(&state, data);
+	}
+	totalSize += currentSize;
+	md5Tail(&state, data, currentSize, totalSize);
+	md5Result(&state, result);
+}
+
+
 

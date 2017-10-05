@@ -11,36 +11,30 @@ gcc -o md5 main.c md5.c
 Usage : md5 <file>
         md5 text.txt
         md5 a.txt b.txt c.txt
-        md5 *
 ```
 
 ## API
 
-### md5Init
 ```C
-void md5Init();
+void md5Init(Md5State* state);
 ```
-Initialzation, should be invoked onece before every times;
 
-
-### md5Count
 ```C
-void md5Count(void* data);
+void md5Count(Md5State* state, void* data);
 ```
-Calculate a group (64 bytes) data
 
-### md5Tail
 ```C
-void md5Tail(void* data, uint8_t currentBytes, uint64_t totalBytes);
+void md5Tail(Md5State* state, void* data, uint8_t currentBytes, uint64_t totalBytes);
 ```
-Calculate the last group (64 bytes) data
 
-### md5Result
 ```C
-void md5Result(char* result);
+void md5Result(Md5State* state, char* result);
 ```
-Return the result of md5 as hex string
 
+```C
+typedef int (*Md5Callback)(void* param, void* data);
+void md5(Md5Callback callback, void* param, char* result);
+```
 
 ## Demo
 
@@ -51,11 +45,12 @@ Return the result of md5 as hex string
 
 int main()
 {
-	md5Init();
+	Md5State state;
+	md5Init(&state);
 	char data[64] = "Hello World";
-	md5Tail(data, 11, 11);
+	md5Tail(&state, data, 11, 11);
 	char md5[33];
-	md5Result(md5);
+	md5Result(&state, md5);
 	printf("%s\n",md5);
 	return 0;
 }
@@ -72,34 +67,25 @@ b10a8db164e0754105b7a99be72e3fe5
 #include <stdio.h>
 #include "md5.h"
 
-int main()
+/* Md5Callback */
+int getData(void* fp, void* data)
 {
-	md5Init();
-	
-	FILE* fp = fopen("C++ Primer.pdf","rb");
+	return fread(data,1,64,(FILE*)fp);
+}
+
+int main()
+{	
+	FILE* fp = fopen("C++ Primer.pdf","rb"); // about 208MB
 	if(fp == NULL)
 	{
 		printf("Open file failed.\n");
 		return 1;
 	}
-	char group[64];
-	
-	size_t totalSize   = 0;
-	size_t currentSize = 0;
-	while(currentSize = fread(group,1,64,fp) , currentSize == 64)
-	{
-		md5Count(group);
-		totalSize += 64;
-	}
-	
-	totalSize += currentSize;
-	md5Tail(group, currentSize, totalSize);
+	char md5Hex[33];
+	md5(getData, fp, md5Hex);
 	fclose(fp);
 	
-	char md5[33];
-	md5Result(md5);
-	
-	printf("%s\n",md5);
+	printf("%s\n",md5Hex);
 	
 	return 0;
 }

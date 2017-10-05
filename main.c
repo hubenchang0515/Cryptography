@@ -3,6 +3,9 @@
 #include <string.h>
 #include "md5.h"
 
+
+int getData(void* fp, void* data);
+
 int main(int argc,char* argv[])
 {
 	if(argc < 2)
@@ -21,22 +24,17 @@ int main(int argc,char* argv[])
 			printf("%s : %s\n", argv[i], strerror(errno));
 			continue;
 		}
-		md5Init();
-		uint8_t group[64];
-		size_t totalSize = 0;
-		size_t currentSize = 0;
-		while(currentSize = fread(group,1,64,fp) , currentSize == 64)
-		{
-			totalSize += 64;
-			md5Count(group);
-		}
-		totalSize += currentSize;
-		md5Tail(group,currentSize,totalSize);
-		char md5[33];
-		md5Result(md5);
-		printf("%s : %s\n", argv[i], md5);
+		char md5Hex[33];
+		md5(getData, fp, md5Hex);
+		printf("%s : %s\n", argv[i], md5Hex);
 		fclose(fp);
 	}
 
 	return 0;
+}
+
+
+int getData(void* fp, void* data)
+{
+	return fread(data,1,64,(FILE*)fp);
 }
