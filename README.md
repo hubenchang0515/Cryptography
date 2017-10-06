@@ -15,38 +15,47 @@ Usage : md5 <file>
 
 ## API
 
+### md5Init
 ```C
 void md5Init(Md5State* state);
 ```
-Initialize state.
+* Initialize state.
 
+
+### md5Count
 ```C
 void md5Count(Md5State* state, void* data);
 ```
-Count a group (64 bytes) data.
+* Count a group (64 bytes) data.
 * Parameter data should have 64 bytes memory and 64 bytes data.
 
+### md5Tail
 ```C
 void md5Tail(Md5State* state, void* data, uint8_t currentBytes, uint64_t totalBytes);
 ```
-Count the last group data.
+* Count the last group data.
 * Parameter data should have 64 bytes memory and no more than 64 bytes data.
 * Parameter currentBytes is the bytes of this group
 * Parameter totalBytes is the bytes of total data.
 
+### md5Result
 ```C
 void md5Result(Md5State* state, char* result);
 ```
-Get the result of MD5 value as hex string.
+*Get the result of MD5 value as hex string.
 
+### md5
 ```C
 typedef int (*Md5Callback)(void* param, void* data);
 
 void md5(Md5Callback callback, void* param, char* result);
 ```
-Function md5 has 3 parameters , param is the parameter pass to callback , result return the MD5 value as hex string.
-Md5Callback write a group (64 bytes) data into parameter data and return 64 while remanent data is more than 64 bytes.
-Md5Callback write remanent data into parameter data and return then length while remanent data is less than 64 bytes.
+* Function md5 has 3 parameters.
+* Parameter callback used to get data.
+* Parameter param will pass to callback 
+* Parameter result will return the MD5 value as hex string.
+* Md5Callback write a group (64 bytes) data into parameter data and return 64 while remanent data is more than 64 bytes.
+* Md5Callback write remanent data into parameter data and return then length while remanent data is less than 64 bytes.
 
 ## API Usage
 ```C
