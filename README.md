@@ -42,7 +42,7 @@ void md5Tail(Md5State* state, void* data, uint8_t currentBytes, uint64_t totalBy
 ```C
 void md5Result(Md5State* state, char* result);
 ```
-*Get the result of MD5 value as hex string.
+* Get the result of MD5 value as hex string.
 
 ### md5
 ```C
