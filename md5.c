@@ -8,18 +8,19 @@ static const uint32_t magicB = 0xefcdab89;
 static const uint32_t magicC = 0x98badcfe;
 static const uint32_t magicD = 0x10325476;
 
-uint32_t rotateLeft(uint32_t n, uint8_t bits)
+static uint32_t rotateLeft(uint32_t n, uint8_t bits)
 {
 	bits &= 0x1f;
 	return (n << bits) | (n >> (32-bits));
 }
 
-uint32_t rotateRight(uint32_t n, uint8_t bits)
+/*
+static uint32_t rotateRight(uint32_t n, uint8_t bits)
 {
 	bits &= 0x1f;
 	return (n >> bits) | (n <<(32-bits));
 }
-
+*/
 
 #define F(X,Y,Z) ((X&Y)|((~X)&Z))  
 #define G(X,Y,Z) ((X&Z)|(Y&(~Z)))  
@@ -64,7 +65,7 @@ void md5Init(Md5State* state)
 
 
 /* calculate one group */
-void md5Count(Md5State* state, void* data)
+void md5Count(Md5State* state, const void* data)
 {
 	uint32_t* M = (uint32_t*)data;
 
@@ -207,8 +208,26 @@ void md5Result(Md5State* state, char* result)
 }
 
 
-/* MD5 */
-void md5(Md5Callback callback, void* param, char* result)
+/* MD5 of memory data */
+void md5(const void* data,size_t length, char* result)
+{
+	Md5State state;
+	md5Init(&state);
+	size_t len = length;
+	const char* group = data;
+	for(; len > 64; len -= 64 , group += 64)
+	{
+		md5Count(&state, group);
+	}
+	
+	char tail[64];
+	memcpy(tail, group, len);
+	md5Tail(&state, tail, len, length);
+	md5Result(&state, result);
+}
+
+/* MD5 of any kind of stream */
+void md5Universal(Md5Callback callback, void* param, char* result)
 {
 	Md5State state;
 	md5Init(&state);

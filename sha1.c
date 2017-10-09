@@ -93,7 +93,7 @@ void sha1Init(Sha1State* state)
 	state->E = magicH4;
 }
 
-void sha1Count(Sha1State* state, void* data)
+void sha1Count(Sha1State* state, const void* data)
 {
 	uint32_t DATA[80];
 
@@ -197,8 +197,27 @@ void sha1Result(Sha1State* state, char* result)
 }
 
 
-/* SHA1 */
-void sha1(Sha1Callback callback, void* param, char* result)
+/* SHA1 of memory data */
+void sha1(const void* data, size_t length, char* result)
+{
+	Sha1State state;
+	sha1Init(&state);
+	size_t len = length;
+	const char* group = data;
+	for(; len > 64; len -= 64 , group += 64)
+	{
+		sha1Count(&state, group);
+	}
+	
+	char tail[64];
+	memcpy(tail, group, len);
+	sha1Tail(&state, tail, len, length);
+	sha1Result(&state, result);
+}
+
+
+/* SHA1 of any kind of stream */
+void sha1Universal(Sha1Callback callback, void* param, char* result)
 {
 	Sha1State state;
 	sha1Init(&state);

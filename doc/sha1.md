@@ -3,87 +3,48 @@ SHA1 in littel-endian machine
 
 # API
 
-### sha1Init
-```C
-void sha1Init(Sha1State* state);
-```
-* Initialize state.
-
-
-### sha1Count
-```C
-void sha1Count(Sha1State* state, void* data);
-```
-* Count a group (64 bytes) data.
-* Parameter data should have 64 bytes memory and 64 bytes data.
-
-### sha1Tail
-```C
-void sha1Tail(Sha1State* state, void* data, uint8_t currentBytes, uint64_t totalBytes);
-```
-* Count the last group data.
-* Parameter data should have 64 bytes memory and no more than 64 bytes data.
-* Parameter currentBytes is the bytes of this group
-* Parameter totalBytes is the bytes of total data.
-
-### sha1Result
-```C
-void sha1Result(Sha1State* state, char* result);
-```
-* Get the result of MD5 value as hex string.
-
 ### sha1
+```C
+void sha1(const void* data, size_t length, char* result);
+```
+Calculate SHA1 value of memory data.
+* Parameter data is the data to calculate.
+* Parameter length is length of data.
+* Parameter result will return SHA1 value as hex string.
+
+### sha1Universal
 ```C
 typedef int (*Sha1Callback)(void* param, void* data);
 
-void sha1(Sha1Callback callback, void* param, char* result);
+void sha1Universal(Sha1Callback callback, void* param, char* result);
 ```
-* Function sha1 has 3 parameters.
-* Parameter callback used to get data.
-* Parameter param will pass to callback 
-* Parameter result will return the MD5 value as hex string.
+Calculate SHA1 value of any kind of stream.
+* Parameter callback is used to get data.
+* Parameter param will pass to callback. 
+* Parameter result will return the SHA1 value as hex string.
 * Sha1Callback write a group (64 bytes) data into parameter data and return 64 while remanent data is more than 64 bytes.
 * Sha1Callback write remanent data into parameter data and return then length while remanent data is less than 64 bytes.
 
-## API Usage
-```C
-// init Sha1State
-Sha1State state;
-sha1Init(&state);
-// count a group data , parameter data should
-sha1Count(&state, data[64]);
-sha1Count(&state, data[64]);
-sha1Count(&state, data[64]);
-// ...
-// count the last group data
-sha1Tail(&state, data[64], currentBytes, totalBytes);
-// get the sha1 value as hex string
-char sha1Hex[33];
-sha1Result(&state, sha1Hex);
-```
 
-### Demo
+## Demo
 
-### Calculate the sha1 of short string
+### Calculate the SHA1 of short string
 ```C
 #include <stdio.h>
+#include <string.h>
 #include "sha1.h"
 
 int main()
 {
-	Sha1State state;
-	sha1Init(&state);
-	char data[64] = "Hello World";
-	sha1Tail(&state, data, 11, 11);
-	char sha1[33];
-	sha1Result(&state, sha1);
-	printf("%s\n",sha1);
+	char data[] = "https://github.com/hubenchang0515/Cryptography";
+	char sha1Value[41];
+	sha1(data, strlen(data), sha1Value);
+	printf("%s\n",sha1Value);
 	return 0;
 }
-
 ```
 
-### Calculate the sha1 of big file
+### Calculate the SHA1 of big file
 ```C
 #include <stdio.h>
 #include "sha1.h"
@@ -102,8 +63,8 @@ int main()
 		printf("Open file failed.\n");
 		return 1;
 	}
-	char sha1Hex[33];
-	sha1(getData, fp, sha1Hex);
+	char sha1Hex[41];
+	sha1Universal(getData, fp, sha1Hex);
 	fclose(fp);
 	
 	printf("%s\n",sha1Hex);

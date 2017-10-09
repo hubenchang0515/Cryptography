@@ -17,16 +17,15 @@ typedef struct Md5State
 	uint32_t D;
 }Md5State;
 
-uint32_t rotateLeft(uint32_t n, uint8_t bits);
-uint32_t rotateRight(uint32_t n, uint8_t bits);
-
 void md5Init(Md5State* state);
-void md5Count(Md5State* state, void* data);
+void md5Count(Md5State* state, const void* data);
 void md5Tail(Md5State* state, void* data, uint8_t currentBytes, uint64_t totalBytes);
 void md5Result(Md5State* state, char* result);
 
+void md5(const void* data,size_t len, char* result);
+
 typedef int (*Md5Callback)(void* param, void* data);
-void md5(Md5Callback callback, void* param, char* result);
+void md5Universal(Md5Callback callback, void* param, char* result);
 
 #ifdef __cplusplus
 	}
