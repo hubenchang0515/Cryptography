@@ -1,5 +1,5 @@
 # Cryptography
-A simple cryptography library of programming luanguage C
+A simple cryptography hash functions library of C programming luanguage.
 * Only work in LITTLE_ENDIAN machine.
 
 ## Note
