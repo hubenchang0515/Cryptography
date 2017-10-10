@@ -151,7 +151,8 @@ void sha1Tail(Sha1State* state, void* data, uint8_t currentBytes, uint64_t total
 	{
 		sha1Count(state, data);
 		uint8_t oneMore[64] = {0};
-		*(uint64_t*)&oneMore[56] = changeEndian64(totalBytes * 8);
+		uint64_t* bits = (uint64_t*)&oneMore[56];
+		*bits = changeEndian64(totalBytes * 8);
 		sha1Count(state, oneMore);
 	}
 	/* needn't one more group */
@@ -203,7 +204,7 @@ void sha1(const void* data, size_t length, char* result)
 	Sha1State state;
 	sha1Init(&state);
 	size_t len = length;
-	const char* group = data;
+	const uint8_t* group = (const uint8_t*)data;
 	for(; len > 64; len -= 64 , group += 64)
 	{
 		sha1Count(&state, group);

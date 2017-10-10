@@ -167,7 +167,8 @@ void md5Tail(Md5State* state, void* data, uint8_t currentBytes, uint64_t totalBy
 	{
 		md5Count(state, data);
 		uint8_t oneMore[64] = {0};
-		*(uint64_t*)&oneMore[56] = totalBytes * 8;
+		uint64_t* bits = (uint64_t*)&oneMore[56];
+		*bits = totalBytes * 8;
 		md5Count(state, oneMore);
 	}
 	/* needn't one more group */
@@ -214,7 +215,7 @@ void md5(const void* data,size_t length, char* result)
 	Md5State state;
 	md5Init(&state);
 	size_t len = length;
-	const char* group = data;
+	const uint8_t* group = (const uint8_t*)data;
 	for(; len > 64; len -= 64 , group += 64)
 	{
 		md5Count(&state, group);
