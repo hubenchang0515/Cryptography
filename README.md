@@ -70,5 +70,5 @@ int main(int argc, char* argv[])
 	return 0;
 }
 ```
-Calculating 200MB file, this programe use 5.685s with ``-O3`` compiling option and 33.012s without the option.  
+In calculating a 200MB file, this program used 5.685s with ``-O3`` compiling option and 33.012s without the option.  
 CPU: ``Intel Core i5-3230M CPU @ 3.2GHz``
