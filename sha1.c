@@ -218,14 +218,14 @@ void sha1(const void* data, size_t length, char* result)
 
 
 /* SHA1 of any kind of stream */
-void sha1Universal(Sha1Callback callback, void* param, char* result)
+void sha1Universal(Sha1Callback callback, void* userdata, char* result)
 {
 	Sha1State state;
 	sha1Init(&state);
 	int currentSize = 0;
 	uint64_t totalSize = 0;
 	uint8_t data[64];
-	while(currentSize = callback(param, data), currentSize == 64)
+	while(currentSize = callback(userdata, 64, data), currentSize == 64)
 	{
 		totalSize += 64;
 		sha1Count(&state, data);

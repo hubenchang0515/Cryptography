@@ -2,17 +2,23 @@
 #include <errno.h>
 #include <string.h>
 #include "md5.h"
+#include "sha1.h"
 
-
-int getData(void* fp, void* data);
+int getData(void* fp,size_t length, void* data);
 
 int main(int argc,char* argv[])
 {
 	if(argc < 2)
 	{
+#ifdef MD5
 		printf("Usage : md5 <file>\n");
 		printf("        md5 text.txt\n");
-
+#elif defined(SHA1)
+		printf("Usage : sha1 <file>\n");
+		printf("        sha1 text.txt\n");
+#else
+	#error add '-DMD5' or '-DSHA1' 
+#endif
 		return 1;
 	}
 
@@ -24,9 +30,15 @@ int main(int argc,char* argv[])
 			printf("%s : %s\n", argv[i], strerror(errno));
 			continue;
 		}
-		char md5Hex[33];
-		md5(getData, fp, md5Hex);
-		printf("%s : %s\n", argv[i], md5Hex);
+		char hex[64];
+#ifdef MD5
+		md5Universal(getData, fp, hex);
+#elif defined(SHA1)
+		sha1Universal(getData, fp, hex);
+#else
+	#error add '-DMD5' or '-DSHA1' 
+#endif
+		printf("%s : %s\n", argv[i], hex);
 		fclose(fp);
 	}
 
@@ -34,7 +46,7 @@ int main(int argc,char* argv[])
 }
 
 
-int getData(void* fp, void* data)
+int getData(void* fp, size_t length, void* data)
 {
-	return fread(data,1,64,(FILE*)fp);
+	return fread(data, 1, length, (FILE*)fp);
 }

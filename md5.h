@@ -24,8 +24,8 @@ void md5Result(Md5State* state, char* result);
 
 void md5(const void* data,size_t len, char* result);
 
-typedef int (*Md5Callback)(void* param, void* data);
-void md5Universal(Md5Callback callback, void* param, char* result);
+typedef int (*Md5Callback)(void* userdata, size_t length, void* data);
+void md5Universal(Md5Callback callback, void* userdata, char* result);
 
 #ifdef __cplusplus
 	}

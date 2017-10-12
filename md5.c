@@ -228,14 +228,14 @@ void md5(const void* data,size_t length, char* result)
 }
 
 /* MD5 of any kind of stream */
-void md5Universal(Md5Callback callback, void* param, char* result)
+void md5Universal(Md5Callback callback, void* userdata, char* result)
 {
 	Md5State state;
 	md5Init(&state);
 	int currentSize = 0;
 	uint64_t totalSize = 0;
 	uint8_t data[64];
-	while(currentSize = callback(param, data), currentSize == 64)
+	while(currentSize = callback(userdata, 64, data), currentSize == 64)
 	{
 		totalSize += 64;
 		md5Count(&state, data);

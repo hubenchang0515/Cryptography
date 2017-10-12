@@ -25,8 +25,8 @@ void sha1Result(Sha1State* state, char* result);
 
 void sha1(const void* data, size_t length, char* result);
 
-typedef int (*Sha1Callback)(void* param, void* data);
-void sha1Universal(Sha1Callback callback, void* param, char* result);
+typedef int (*Sha1Callback)(void* userdata, size_t length, void* data);
+void sha1Universal(Sha1Callback callback, void* userdata, char* result);
 
 #ifdef __cplusplus
 	}

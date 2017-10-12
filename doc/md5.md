@@ -14,16 +14,22 @@ Calculate MD5 value of memory data.
 
 ### md5Universal
 ```C
-typedef int (*Md5Callback)(void* param, void* data);
-
-void md5Universal(Md5Callback callback, void* param, char* result);
+void md5Universal(Md5Callback callback, void* userdata, char* result);
 ```
 Calculate MD5 value of any kind of stream.
 * Parameter callback is used to get data.
-* Parameter param will pass to callback. 
+* Parameter userdata will pass to callback. 
 * Parameter result will return the MD5 value as hex string.
-* Sha1Callback write a group (64 bytes) data into parameter data and return 64 while remanent data is more than 64 bytes.
-* Sha1Callback write remanent data into parameter data and return then length while remanent data is less than 64 bytes.
+
+### Md5Callback
+```C
+typedef int (*Md5Callback)(void* userdata, size_t length, void* data);
+```
+Parameter userdata is passed from function md5Universal.
+Parameter length means how many bytes of data want to get.
+Parameter data will return the data.
+This callback function will return the true length of gotten data.
+
 
 
 ## Demo
@@ -50,9 +56,9 @@ int main()
 #include "md5.h"
 
 /* Md5Callback */
-int getData(void* fp, void* data)
+int getData(void* fp, size_t length, void* data)
 {
-	return fread(data,1,64,(FILE*)fp);
+	return fread(data,1,length,(FILE*)fp);
 }
 
 int main()
