@@ -3,8 +3,8 @@ A simple cryptography hash functions library of C programming luanguage.
 
 ## Note
 * Hasn't been tested in big-endian machine.
-* Complier's uint32_t should be unsigned int or unsigned long
-* Compiler's uint64_t should be unsigned long or unsigned long long
+* Complier's ``uint32_t`` should be ``unsigned int`` or ``unsigned long``.
+* Compiler's ``uint64_t`` should be ``unsigned long`` or ``unsigned long long``.
 * May need ``-fno-strict-aliasing`` compiling option.
 
 ## API Index
