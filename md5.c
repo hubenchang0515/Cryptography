@@ -8,6 +8,28 @@ static const uint32_t magicB = 0xefcdab89;
 static const uint32_t magicC = 0x98badcfe;
 static const uint32_t magicD = 0x10325476;
 
+static uint32_t readAsLittleEndian32(uint8_t* data)
+{
+	return 
+	(((uint32_t)data[0])) |
+	(((uint32_t)data[1]) << 8) |
+	(((uint32_t)data[2]) << 16)  |
+	(((uint32_t)data[3]) << 24);
+}
+
+static void writeAsLittleEndian64(uint64_t value, uint8_t* data)
+{
+	data[0] = value;
+	data[1] = value >> 8;
+	data[2] = value >> 16;
+	data[3] = value >> 24;
+	data[4] = value >> 32;
+	data[5] = value >> 40;
+	data[6] = value >> 48;
+	data[7] = value >> 56;
+}
+
+
 static uint32_t rotateLeft(uint32_t n, uint8_t bits)
 {
 	bits &= 0x1f;
@@ -67,7 +89,11 @@ void md5Init(Md5State* state)
 /* calculate one group */
 void md5Count(Md5State* state, const void* data)
 {
-	uint32_t* M = (uint32_t*)data;
+	uint32_t M[16];
+	for(size_t i = 0; i < 16; i++)
+	{
+		M[i] = readAsLittleEndian32(((uint8_t*)data) + i*4);
+	}
 
 	uint32_t a = state->A;
 	uint32_t b = state->B;
@@ -167,14 +193,13 @@ void md5Tail(Md5State* state, void* data, uint8_t currentBytes, uint64_t totalBy
 	{
 		md5Count(state, data);
 		uint8_t oneMore[64] = {0};
-		uint64_t* bits = (uint64_t*)&oneMore[56];
-		*bits = totalBytes * 8;
+		writeAsLittleEndian64(totalBytes * 8, oneMore+56);
 		md5Count(state, oneMore);
 	}
 	/* needn't one more group */
 	else
 	{
-		*(uint64_t*)((uint8_t*)data+56) = totalBytes * 8;
+		writeAsLittleEndian64(totalBytes * 8, ((uint8_t*)data+56));
 		md5Count(state, data);
 	}
 	

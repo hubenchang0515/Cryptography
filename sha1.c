@@ -12,28 +12,28 @@ static const uint32_t magicH3 = 0x10325476;
 static const uint32_t magicH4 = 0xc3d2e1f0;
 
 
-static uint32_t changeEndian32(uint32_t n)
+
+static uint32_t readAsBigEndian32(uint8_t* data)
 {
 	return 
-	((n & 0xff000000) >> 24) |
-	((n & 0x00ff0000) >> 8) |
-	((n & 0x0000ff00) << 8) |
-	((n & 0x000000ff) << 24) ;
+	(((uint32_t)data[0]) << 24) |
+	(((uint32_t)data[1]) << 16) |
+	(((uint32_t)data[2]) << 8)  |
+	(((uint32_t)data[3]));
 }
 
-static uint64_t changeEndian64(uint64_t n)
+static void writeAsBigEndian64(uint64_t value, uint8_t* data)
 {
-	return 
-	((n & 0xff00000000000000ULL) >> 56) |
-	((n & 0x00ff000000000000ULL) >> 40) |
-	((n & 0x0000ff0000000000ULL) >> 24) |
-	((n & 0x000000ff00000000ULL) >> 8) |
-	
-	((n & 0x00000000ff000000ULL) << 8) |
-	((n & 0x0000000000ff0000ULL) << 24) |
-	((n & 0x000000000000ff00ULL) << 40) |
-	((n & 0x00000000000000ffULL) << 56) ;
+	data[0] = value >> 56;
+	data[1] = value >> 48;
+	data[2] = value >> 40;
+	data[3] = value >> 32;
+	data[4] = value >> 24;
+	data[5] = value >> 16;
+	data[6] = value >> 8;
+	data[7] = value;
 }
+
 
 static uint32_t rotateLeft(uint32_t n, uint8_t bits)
 {
@@ -100,7 +100,7 @@ void sha1Count(Sha1State* state, const void* data)
 	int i = 0;
 	for(; i < 16; i++)
 	{
-		DATA[i] = changeEndian32(((uint32_t*)data)[i]);
+		DATA[i] = readAsBigEndian32(((uint8_t*)data) + i*4);
 	}
 	
 	for(; i < 80; i++)
@@ -151,14 +151,13 @@ void sha1Tail(Sha1State* state, void* data, uint8_t currentBytes, uint64_t total
 	{
 		sha1Count(state, data);
 		uint8_t oneMore[64] = {0};
-		uint64_t* bits = (uint64_t*)&oneMore[56];
-		*bits = changeEndian64(totalBytes * 8);
+		writeAsBigEndian64(totalBytes * 8, oneMore+56);
 		sha1Count(state, oneMore);
 	}
 	/* needn't one more group */
 	else
 	{
-		*(uint64_t*)((uint8_t*)data+56) = changeEndian64(totalBytes * 8);
+		writeAsBigEndian64(totalBytes * 8, ((uint8_t*)data+56));
 		sha1Count(state, data);
 	}
 	
@@ -169,32 +168,7 @@ void sha1Tail(Sha1State* state, void* data, uint8_t currentBytes, uint64_t total
 /* Get the result as hex string */
 void sha1Result(Sha1State* state, char* result)
 {
-	sprintf(result, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-					(uint8_t)(state->A>>24),
-					(uint8_t)(state->A>>16),
-					(uint8_t)(state->A>>8),
-					(uint8_t)(state->A),
-	
-					(uint8_t)(state->B>>24),
-					(uint8_t)(state->B>>16),
-					(uint8_t)(state->B>>8),
-					(uint8_t)(state->B),
-	
-					(uint8_t)(state->C>>24),
-					(uint8_t)(state->C>>16),
-					(uint8_t)(state->C>>8),
-					(uint8_t)(state->C),
-	
-					(uint8_t)(state->D>>24),
-					(uint8_t)(state->D>>16),
-					(uint8_t)(state->D>>8),
-					(uint8_t)(state->D),
-					
-					(uint8_t)(state->E>>24),
-					(uint8_t)(state->E>>16),
-					(uint8_t)(state->E>>8),
-					(uint8_t)(state->E)
-		);
+	sprintf(result, "%08x%08x%08x%08x%08x",state->A,state->B,state->C,state->D,state->E);
 }
 
 

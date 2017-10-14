@@ -1,6 +1,6 @@
 # Cryptography
 A simple cryptography hash functions library of C programming luanguage.
-* Only work in LITTLE_ENDIAN machine.
+* Hasn't been tested in big-endian machine.
 
 ## Note
 May need ``-fno-strict-aliasing`` compiling option.

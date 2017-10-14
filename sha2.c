@@ -22,7 +22,7 @@ static uint64_t rotateRight64(uint64_t n, uint8_t bits)
 	bits &= 0x3f;
 	return (n >> bits) | (n << (64-bits));
 }
-
+/*
 static uint32_t changeEndian32(uint32_t n)
 {
 	return 
@@ -32,18 +32,62 @@ static uint32_t changeEndian32(uint32_t n)
 	((n & 0x000000ff) << 24) ;
 }
 
+
 static uint64_t changeEndian64(uint64_t n)
 {
 	return 
 	((n & 0xff00000000000000ULL) >> 56) |
 	((n & 0x00ff000000000000ULL) >> 40) |
 	((n & 0x0000ff0000000000ULL) >> 24) |
-	((n & 0x000000ff00000000ULL) >> 8) |
+	((n & 0x000000ff00000000ULL) >> 8)  |
 	
-	((n & 0x00000000ff000000ULL) << 8) |
+	((n & 0x00000000ff000000ULL) << 8)  |
 	((n & 0x0000000000ff0000ULL) << 24) |
 	((n & 0x000000000000ff00ULL) << 40) |
 	((n & 0x00000000000000ffULL) << 56) ;
+}
+*/
+static uint32_t readAsBigEndian32(uint8_t* data)
+{
+	return 
+	(((uint32_t)data[0]) << 24) |
+	(((uint32_t)data[1]) << 16) |
+	(((uint32_t)data[2]) << 8)  |
+	(((uint32_t)data[3]));
+}
+
+/*
+static void writeAsBigEndian32(uint32_t value, uint8_t* data)
+{
+	data[0] = value >> 24;
+	data[1] = value >> 16;
+	data[2] = value >> 8;
+	data[3] = value;
+}
+*/
+static uint64_t readAsBigEndian64(uint8_t* data)
+{
+	return 
+	(((uint64_t)data[0]) << 56) |
+	(((uint64_t)data[1]) << 48) |
+	(((uint64_t)data[2]) << 40) |
+	(((uint64_t)data[3]) << 32) |
+	(((uint64_t)data[4]) << 24) |
+	(((uint64_t)data[5]) << 16) |
+	(((uint64_t)data[6]) << 8)  |
+	(((uint64_t)data[7]));
+}
+
+static void writeAsBigEndian64(uint64_t value, uint8_t* data)
+{
+	data[0] = value >> 56;
+	data[1] = value >> 48;
+	data[2] = value >> 40;
+	data[3] = value >> 32;
+	data[4] = value >> 24;
+	data[5] = value >> 16;
+	data[6] = value >> 8;
+	data[7] = value;
 }
 
 /* SHA256 START */
@@ -82,7 +126,7 @@ void sha256Count(Sha256State* state, const void* data)
 	size_t i = 0;
 	for(; i < 16; i++)
 	{
-		DATA[i] = changeEndian32(((uint32_t*)data)[i]);
+		DATA[i] = readAsBigEndian32(((uint8_t*)data) + i*4);//changeEndian32(((uint32_t*)data)[i]);
 	}
 	
 	for(; i < 64; i++)
@@ -149,14 +193,13 @@ void sha256Tail(Sha256State* state,void* data, uint8_t currentBytes, uint64_t to
 	{
 		sha256Count(state, data);
 		uint8_t oneMore[64] = {0};
-		uint64_t* bits = (uint64_t*)&oneMore[56];
-		*bits = changeEndian64(totalBytes * 8);
+		writeAsBigEndian64(totalBytes * 8, oneMore+56);
 		sha256Count(state, oneMore);
 	}
 	/* needn't one more group */
 	else
 	{
-		*(uint64_t*)((uint8_t*)data+56) = changeEndian64(totalBytes * 8);
+		writeAsBigEndian64(totalBytes * 8, ((uint8_t*)data+56));
 		sha256Count(state, data);
 	}
 }
@@ -165,49 +208,9 @@ void sha256Tail(Sha256State* state,void* data, uint8_t currentBytes, uint64_t to
 /* Get the SHA256 value as hex string */
 void sha256Result(Sha256State* state, char* result)
 {
-	sprintf(result,
-			"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-			(uint8_t)(state->A>>24),
-			(uint8_t)(state->A>>16),
-			(uint8_t)(state->A>>8),
-			(uint8_t)(state->A),
-	
-			(uint8_t)(state->B>>24),
-			(uint8_t)(state->B>>16),
-			(uint8_t)(state->B>>8),
-			(uint8_t)(state->B),
-	
-			(uint8_t)(state->C>>24),
-			(uint8_t)(state->C>>16),
-			(uint8_t)(state->C>>8),
-			(uint8_t)(state->C),
-	
-			(uint8_t)(state->D>>24),
-			(uint8_t)(state->D>>16),
-			(uint8_t)(state->D>>8),
-			(uint8_t)(state->D),
-			
-			(uint8_t)(state->E>>24),
-			(uint8_t)(state->E>>16),
-			(uint8_t)(state->E>>8),
-			(uint8_t)(state->E),
-			
-			(uint8_t)(state->F>>24),
-			(uint8_t)(state->F>>16),
-			(uint8_t)(state->F>>8),
-			(uint8_t)(state->F),
-	
-			(uint8_t)(state->G>>24),
-			(uint8_t)(state->G>>16),
-			(uint8_t)(state->G>>8),
-			(uint8_t)(state->G),
-			
-			(uint8_t)(state->H>>24),
-			(uint8_t)(state->H>>16),
-			(uint8_t)(state->H>>8),
-			(uint8_t)(state->H)
-	);
+	sprintf(result, "%08x%08x%08x%08x%08x%08x%08x%08x",
+			state->A, state->B, state->C, state->D,
+			state->E, state->F, state->G, state->H);
 }
 
 
@@ -266,45 +269,9 @@ void sha224Init( Sha256State* state)
 /* Get the SHA224 value as hex string */
 void sha224Result( Sha224State* state, char* result)
 {
-	sprintf(result,
-			"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-			(uint8_t)(state->A>>24),
-			(uint8_t)(state->A>>16),
-			(uint8_t)(state->A>>8),
-			(uint8_t)(state->A),
-	
-			(uint8_t)(state->B>>24),
-			(uint8_t)(state->B>>16),
-			(uint8_t)(state->B>>8),
-			(uint8_t)(state->B),
-	
-			(uint8_t)(state->C>>24),
-			(uint8_t)(state->C>>16),
-			(uint8_t)(state->C>>8),
-			(uint8_t)(state->C),
-	
-			(uint8_t)(state->D>>24),
-			(uint8_t)(state->D>>16),
-			(uint8_t)(state->D>>8),
-			(uint8_t)(state->D),
-			
-			(uint8_t)(state->E>>24),
-			(uint8_t)(state->E>>16),
-			(uint8_t)(state->E>>8),
-			(uint8_t)(state->E),
-			
-			(uint8_t)(state->F>>24),
-			(uint8_t)(state->F>>16),
-			(uint8_t)(state->F>>8),
-			(uint8_t)(state->F),
-	
-			(uint8_t)(state->G>>24),
-			(uint8_t)(state->G>>16),
-			(uint8_t)(state->G>>8),
-			(uint8_t)(state->G)
-			
-	);
+	sprintf(result, "%08x%08x%08x%08x%08x%08x%08x",
+			state->A, state->B, state->C, state->D, 
+			state->E, state->F, state->G);
 }
 
 /* SHA224 of memory data */
@@ -394,7 +361,7 @@ void sha512Count( Sha512State* state, const void* data)
 	size_t i = 0;
 	for(; i < 16; i++)
 	{
-		DATA[i] = changeEndian64(((uint64_t*)data)[i]);
+		DATA[i] = readAsBigEndian64(((uint8_t*)data) + i*8);
 	}
 	
 	for(; i < 80; i++)
@@ -443,13 +410,13 @@ void sha512Count( Sha512State* state, const void* data)
 }
 
 /* Append the size bits */
-static void sha512Set128BitsSize(uint64_t* addr, uint64_t totalBytesL, uint64_t totalBytesH)
+static void sha512Set128BitsSize(uint8_t* addr, uint64_t totalBytesL, uint64_t totalBytesH)
 {
 	uint64_t bitsL = totalBytesL * 8;
 	uint64_t carry = totalBytesL / (UINT64_MAX / 8); // totalBytesL * 8 / UINT64_MAX 乘法交换律
 	uint64_t bitsH = totalBytesH * 8 + carry;
-	*addr = changeEndian64(bitsH);
-	*(addr+1) = changeEndian64(bitsL);
+	writeAsBigEndian64(bitsH, addr);
+	writeAsBigEndian64(bitsL, addr + 8);
 }
 
 /* Calculate the last group data */
@@ -470,14 +437,14 @@ void sha512Tail(Sha512State* state,void* data, uint8_t currentBytes, uint64_t to
 	{
 		sha512Count(state, data);
 		uint8_t oneMore[128] = {0};
-		uint64_t* bits = (uint64_t*)&oneMore[112];
+		uint8_t* bits = &oneMore[112];
 		sha512Set128BitsSize(bits,totalBytesL,totalBytesH);
 		sha512Count(state, oneMore);
 	}
 	/* needn't one more group */
 	else
 	{
-		uint64_t* bits = (uint64_t*)(((uint8_t*)data)+112);
+		uint8_t* bits = (((uint8_t*)data)+112);
 		sha512Set128BitsSize(bits,totalBytesL,totalBytesH);
 		sha512Count(state, data);
 	}
@@ -486,88 +453,9 @@ void sha512Tail(Sha512State* state,void* data, uint8_t currentBytes, uint64_t to
 /* Get the SHA512 value as hex string */
 void sha512Result(Sha512State* state, char* result)
 {
-	sprintf(result,
-			"%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x",
-			
-			(uint8_t)(state->A>>56),
-			(uint8_t)(state->A>>48),
-			(uint8_t)(state->A>>40),
-			(uint8_t)(state->A>>32),
-			(uint8_t)(state->A>>24),
-			(uint8_t)(state->A>>16),
-			(uint8_t)(state->A>>8),
-			(uint8_t)(state->A),
-	
-			(uint8_t)(state->B>>56),
-			(uint8_t)(state->B>>48),
-			(uint8_t)(state->B>>40),
-			(uint8_t)(state->B>>32),
-			(uint8_t)(state->B>>24),
-			(uint8_t)(state->B>>16),
-			(uint8_t)(state->B>>8),
-			(uint8_t)(state->B),
-			
-			(uint8_t)(state->C>>56),
-			(uint8_t)(state->C>>48),
-			(uint8_t)(state->C>>40),
-			(uint8_t)(state->C>>32),
-			(uint8_t)(state->C>>24),
-			(uint8_t)(state->C>>16),
-			(uint8_t)(state->C>>8),
-			(uint8_t)(state->C),
-			
-			(uint8_t)(state->D>>56),
-			(uint8_t)(state->D>>48),
-			(uint8_t)(state->D>>40),
-			(uint8_t)(state->D>>32),
-			(uint8_t)(state->D>>24),
-			(uint8_t)(state->D>>16),
-			(uint8_t)(state->D>>8),
-			(uint8_t)(state->D),
-			
-			(uint8_t)(state->E>>56),
-			(uint8_t)(state->E>>48),
-			(uint8_t)(state->E>>40),
-			(uint8_t)(state->E>>32),
-			(uint8_t)(state->E>>24),
-			(uint8_t)(state->E>>16),
-			(uint8_t)(state->E>>8),
-			(uint8_t)(state->E),
-			
-			(uint8_t)(state->F>>56),
-			(uint8_t)(state->F>>48),
-			(uint8_t)(state->F>>40),
-			(uint8_t)(state->F>>32),
-			(uint8_t)(state->F>>24),
-			(uint8_t)(state->F>>16),
-			(uint8_t)(state->F>>8),
-			(uint8_t)(state->F),
-			
-			(uint8_t)(state->G>>56),
-			(uint8_t)(state->G>>48),
-			(uint8_t)(state->G>>40),
-			(uint8_t)(state->G>>32),
-			(uint8_t)(state->G>>24),
-			(uint8_t)(state->G>>16),
-			(uint8_t)(state->G>>8),
-			(uint8_t)(state->G),
-			
-			(uint8_t)(state->H>>56),
-			(uint8_t)(state->H>>48),
-			(uint8_t)(state->H>>40),
-			(uint8_t)(state->H>>32),
-			(uint8_t)(state->H>>24),
-			(uint8_t)(state->H>>16),
-			(uint8_t)(state->H>>8),
-			(uint8_t)(state->H)
-	);
+	sprintf(result, "%16lx%16lx%16lx%16lx%16lx%16lx%16lx%16lx",
+			state->A, state->B, state->C, state->D,
+			state->E, state->F, state->G, state->H);
 }
 
 /* SHA512 of memory data */
@@ -580,7 +468,7 @@ void sha512(const void* data, size_t length, char* result)
 	for(; len > 128; len -= 128 , group += 128)
 	{
 		sha512Count(&state, group);
-	}
+	} 
 	
 	char tail[128];
 	memcpy(tail, group, len);
@@ -646,68 +534,7 @@ void sha384Init(Sha384State* state)
 /* Get the SHA384 value as hex string */
 void sha384Result(Sha384State* state, char* result)
 {
-	sprintf(result,
-			"%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x"
-			"%02x%02x%02x%02x%02x%02x%02x%02x",
-			
-			(uint8_t)(state->A>>56),
-			(uint8_t)(state->A>>48),
-			(uint8_t)(state->A>>40),
-			(uint8_t)(state->A>>32),
-			(uint8_t)(state->A>>24),
-			(uint8_t)(state->A>>16),
-			(uint8_t)(state->A>>8),
-			(uint8_t)(state->A),
-	
-			(uint8_t)(state->B>>56),
-			(uint8_t)(state->B>>48),
-			(uint8_t)(state->B>>40),
-			(uint8_t)(state->B>>32),
-			(uint8_t)(state->B>>24),
-			(uint8_t)(state->B>>16),
-			(uint8_t)(state->B>>8),
-			(uint8_t)(state->B),
-			
-			(uint8_t)(state->C>>56),
-			(uint8_t)(state->C>>48),
-			(uint8_t)(state->C>>40),
-			(uint8_t)(state->C>>32),
-			(uint8_t)(state->C>>24),
-			(uint8_t)(state->C>>16),
-			(uint8_t)(state->C>>8),
-			(uint8_t)(state->C),
-			
-			(uint8_t)(state->D>>56),
-			(uint8_t)(state->D>>48),
-			(uint8_t)(state->D>>40),
-			(uint8_t)(state->D>>32),
-			(uint8_t)(state->D>>24),
-			(uint8_t)(state->D>>16),
-			(uint8_t)(state->D>>8),
-			(uint8_t)(state->D),
-			
-			(uint8_t)(state->E>>56),
-			(uint8_t)(state->E>>48),
-			(uint8_t)(state->E>>40),
-			(uint8_t)(state->E>>32),
-			(uint8_t)(state->E>>24),
-			(uint8_t)(state->E>>16),
-			(uint8_t)(state->E>>8),
-			(uint8_t)(state->E),
-			
-			(uint8_t)(state->F>>56),
-			(uint8_t)(state->F>>48),
-			(uint8_t)(state->F>>40),
-			(uint8_t)(state->F>>32),
-			(uint8_t)(state->F>>24),
-			(uint8_t)(state->F>>16),
-			(uint8_t)(state->F>>8),
-			(uint8_t)(state->F)
-	);
+	sprintf(result,"%016lx%016lx%016lx%016lx%016lx%016lx",state->A,state->B,state->C,state->D,state->E,state->F);
 }
 
 /* SHA384 of memory data */
