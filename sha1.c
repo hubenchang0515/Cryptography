@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <limits.h>
 #include "sha1.h"
 
 /* Magic Number in little-endian machine */
@@ -168,7 +169,13 @@ void sha1Tail(Sha1State* state, void* data, uint8_t currentBytes, uint64_t total
 /* Get the result as hex string */
 void sha1Result(Sha1State* state, char* result)
 {
+#if UINT32_MAX == UINT_MAX
 	sprintf(result, "%08x%08x%08x%08x%08x",state->A,state->B,state->C,state->D,state->E);
+#elif UINT32_MAX == ULONG_MAX
+	sprintf(result, "%08lx%08lx%08lx%08lx%08lx",state->A,state->B,state->C,state->D,state->E);
+#else
+	#error uint32_t is not unsigned int or unsigned long in current compiler.
+#endif
 }
 
 

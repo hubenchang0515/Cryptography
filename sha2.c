@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <limits.h>
 #include "sha2.h"
 
 /*
@@ -208,9 +209,17 @@ void sha256Tail(Sha256State* state,void* data, uint8_t currentBytes, uint64_t to
 /* Get the SHA256 value as hex string */
 void sha256Result(Sha256State* state, char* result)
 {
+#if UINT32_MAX == UINT_MAX
 	sprintf(result, "%08x%08x%08x%08x%08x%08x%08x%08x",
 			state->A, state->B, state->C, state->D,
 			state->E, state->F, state->G, state->H);
+#elif UINT32_MAX == ULONG_MAX
+	sprintf(result, "%08lx%08lx%08lx%08lx%08lx%08lx%08lx%08lx",
+			state->A, state->B, state->C, state->D,
+			state->E, state->F, state->G, state->H);
+#else
+	#error uint32_t is not unsigned int or unsigned long in current compiler.
+#endif
 }
 
 
@@ -269,9 +278,17 @@ void sha224Init( Sha256State* state)
 /* Get the SHA224 value as hex string */
 void sha224Result( Sha224State* state, char* result)
 {
+#if UINT32_MAX == UINT_MAX
 	sprintf(result, "%08x%08x%08x%08x%08x%08x%08x",
 			state->A, state->B, state->C, state->D, 
 			state->E, state->F, state->G);
+#elif UINT32_MAX == ULONG_MAX
+	sprintf(result, "%08x%08x%08x%08x%08x%08x%08x",
+			state->A, state->B, state->C, state->D, 
+			state->E, state->F, state->G);
+#else
+	#error uint32_t is not unsigned int or unsigned long in current compiler.
+#endif
 }
 
 /* SHA224 of memory data */
@@ -453,9 +470,17 @@ void sha512Tail(Sha512State* state,void* data, uint8_t currentBytes, uint64_t to
 /* Get the SHA512 value as hex string */
 void sha512Result(Sha512State* state, char* result)
 {
-	sprintf(result, "%16lx%16lx%16lx%16lx%16lx%16lx%16lx%16lx",
+#if UINT64_MAX == ULONG_MAX
+	sprintf(result, "%016lx%016lx%016lx%016lx%016lx%016lx%016lx%016lx",
 			state->A, state->B, state->C, state->D,
 			state->E, state->F, state->G, state->H);
+#elif UINT64_MAX == ULLONG_MAX
+	sprintf(result, "%016llx%016llx%016llx%016llx%016llx%016llx%016llx%016llx",
+			state->A, state->B, state->C, state->D,
+			state->E, state->F, state->G, state->H);
+#else
+	#error uint64_t is not unsigned long or unsigned long long in current compiler.
+#endif
 }
 
 /* SHA512 of memory data */
@@ -534,7 +559,13 @@ void sha384Init(Sha384State* state)
 /* Get the SHA384 value as hex string */
 void sha384Result(Sha384State* state, char* result)
 {
+#if UINT64_MAX == ULONG_MAX
 	sprintf(result,"%016lx%016lx%016lx%016lx%016lx%016lx",state->A,state->B,state->C,state->D,state->E,state->F);
+#elif UINT64_MAX == ULLONG_MAX
+	sprintf(result,"%016llx%016llx%016llx%016llx%016llx%016llx",state->A,state->B,state->C,state->D,state->E,state->F);
+#else
+	#error uint64_t is not unsigned long or unsigned long long in current compiler.
+#endif
 }
 
 /* SHA384 of memory data */

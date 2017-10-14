@@ -1,9 +1,11 @@
 # Cryptography
 A simple cryptography hash functions library of C programming luanguage.
-* Hasn't been tested in big-endian machine.
 
 ## Note
-May need ``-fno-strict-aliasing`` compiling option.
+* Hasn't been tested in big-endian machine.
+* Complier's uint32_t should be unsigned int or unsigned long
+* Compiler's uint64_t should be unsigned long or unsigned long long
+* May need ``-fno-strict-aliasing`` compiling option.
 
 ## API Index
 [MD5](doc/md5.md)  
