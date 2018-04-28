@@ -11,47 +11,62 @@ int getData(void* fp, size_t length, void* data)
 	return fread(data,1,length,(FILE*)fp);
 }
 
+typedef struct CallListNode{
+	char* key;
+	void (*func)(Md5Callback , void*, char*);
+}CallListNode;
+
+CallListNode callList[] = 
+{
+	{"md5", md5Universal},
+	{"sha224", sha224Universal},
+	{"sha256", sha256Universal},
+	{"sha384", sha384Universal},
+	{"sha512", sha512Universal},
+	{NULL,NULL}
+};
+
 int main(int argc, char* argv[])
 {	
-	if(argc != 2)
+	if(argc != 3)
 	{
-		printf("Usage : %s <file>\n", argv[0]);
-		printf("        %s text.txt\n", argv[0]);
+		printf("Usage : %s [md5|sha1|sha224|sha256|sha384|sha512] <file>\n", argv[0]);
+		printf("        %s md5 text.txt\n", argv[0]);
+		printf("        %s sha256 text.txt\n", argv[0]);
 		
 		return 1;
 	}
-	FILE* fp = fopen(argv[1],"rb");
-	if(fp == NULL)
+	
+	CallListNode* node = callList;
+	for(; node->key != NULL; node++)
 	{
-		printf("%s\n",strerror(errno));
+		if(!strcmp(argv[1],node->key) && strlen(argv[1]) == strlen(node->key))
+		{
+			FILE* fp = fopen(argv[2],"rb");
+			if(fp == NULL)
+			{
+				printf("%s\n",strerror(errno));
+				return 1;
+			}
+			char output[256];
+			node->func(getData, fp, output);
+			fclose(fp);
+			printf("%s\n", output);
+			return 0;
+		}
+	}
+	
+	if(node->key == NULL)
+	{
+		printf("Usage : %s [md5|sha1|sha224|sha256|sha384|sha512] <file>\n", argv[0]);
+		printf("        %s md5 text.txt\n", argv[0]);
+		printf("        %s sha256 text.txt\n", argv[0]);
+		
 		return 1;
 	}
-	char hex[129];
-	md5Universal(getData, fp, hex);
-	printf("   MD5: %s\n",hex);
-	fseek(fp,SEEK_SET,0);
 	
-	sha1Universal(getData, fp, hex);
-	printf("  SHA1: %s\n",hex);
-	fseek(fp,SEEK_SET,0);
 	
-	sha224Universal(getData, fp, hex);
-	printf("SHA224: %s\n",hex);
-	fseek(fp,SEEK_SET,0);
 	
-	sha256Universal(getData, fp, hex);
-	printf("SHA256: %s\n",hex);
-	fseek(fp,SEEK_SET,0);
-	
-	sha384Universal(getData, fp, hex);
-	printf("SHA384: %s\n",hex);
-	fseek(fp,SEEK_SET,0);
-	
-	sha512Universal(getData, fp, hex);
-	printf("SHA512: %s\n",hex);
-	fseek(fp,SEEK_SET,0);
-	
-	fclose(fp);
 	
 	return 0;
 }
