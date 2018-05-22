@@ -11,11 +11,14 @@ int getData(void* fp, size_t length, void* data)
 	return fread(data,1,length,(FILE*)fp);
 }
 
+
 typedef struct CallListNode{
 	char* key;
 	void (*func)(Md5Callback , void*, char*);
 }CallListNode;
 
+
+/* Options List */
 CallListNode callList[] = 
 {
 	{"md5", md5Universal},
@@ -25,6 +28,14 @@ CallListNode callList[] =
 	{"sha512", sha512Universal},
 	{NULL,NULL}
 };
+
+
+const char* filename(const char* filepath)
+{
+	const char* p = filepath + strlen(filepath) - 1;
+	for(; p!= filepath && *p != '/' && *p != '\\'; p--);
+	return p;
+}
 
 int main(int argc, char* argv[])
 {	
