@@ -13,7 +13,7 @@ int getData(void* fp, size_t length, void* data)
 
 
 typedef struct CallListNode{
-	char* key;
+	const char* key;
 	void (*func)(Md5Callback , void*, char*);
 }CallListNode;
 
