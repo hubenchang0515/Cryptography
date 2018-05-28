@@ -69,9 +69,9 @@ int main(int argc, char* argv[])
 	
 	if(node->key == NULL)
 	{
-		printf("Usage : %s [md5|sha1|sha224|sha256|sha384|sha512] <file>\n", argv[0]);
-		printf("        %s md5 text.txt\n", argv[0]);
-		printf("        %s sha256 text.txt\n", argv[0]);
+		printf("Usage : %s [md5|sha1|sha224|sha256|sha384|sha512] <file>\n", filename(argv[0]));
+		printf("        %s md5 text.txt\n", filename(argv[0]));
+		printf("        %s sha256 text.txt\n", filename(argv[0]));
 		
 		return 1;
 	}
