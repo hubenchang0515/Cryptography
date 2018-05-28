@@ -33,7 +33,7 @@ CallListNode callList[] =
 const char* filename(const char* filepath)
 {
 	const char* p = filepath + strlen(filepath) - 1;
-	for(; p!= filepath && *p != '/' && *p != '\\'; p--);
+	for(; p >= filepath && *p != '/' && *p != '\\'; p--);
 	return p+1;
 }
 
