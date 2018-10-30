@@ -39,46 +39,35 @@ const char* filename(const char* filepath)
 
 int main(int argc, char* argv[])
 {	
-	if(argc != 3)
+
+	if(argc == 3)
 	{
-		printf("Usage : %s [md5|sha1|sha224|sha256|sha384|sha512] <file>\n", filename(argv[0]));
-		printf("        %s md5 text.txt\n", filename(argv[0]));
-		printf("        %s sha256 text.txt\n", filename(argv[0]));
-		
-		return 1;
-	}
-	
-	CallListNode* node = callList;
-	for(; node->key != NULL; node++)
-	{
-		if(!strcmp(argv[1],node->key) && strlen(argv[1]) == strlen(node->key))
+		CallListNode* node = callList;
+		for(; node->key != NULL; node++)
 		{
-			FILE* fp = fopen(argv[2],"rb");
-			if(fp == NULL)
+			if(!strcmp(argv[1],node->key) )
 			{
-				printf("%s\n",strerror(errno));
-				return 1;
+				FILE* fp = fopen(argv[2],"rb");
+				if(fp == NULL)
+				{
+					printf("%s\n",strerror(errno));
+					return 1;
+				}
+				char output[256];
+				node->func(getData, fp, output);
+				fclose(fp);
+				printf("%s\n", output);
+				return 0;
 			}
-			char output[256];
-			node->func(getData, fp, output);
-			fclose(fp);
-			printf("%s\n", output);
-			return 0;
 		}
 	}
 	
-	if(node->key == NULL)
-	{
-		printf("Usage : %s [md5|sha1|sha224|sha256|sha384|sha512] <file>\n", filename(argv[0]));
-		printf("        %s md5 text.txt\n", filename(argv[0]));
-		printf("        %s sha256 text.txt\n", filename(argv[0]));
+
+	printf("Usage   : %s [md5|sha1|sha224|sha256|sha384|sha512] <file>\n", filename(argv[0]));
+	printf("Example : %s md5 text.txt\n", filename(argv[0]));
+	printf("          %s sha256 text.txt\n", filename(argv[0]));
 		
-		return 1;
-	}
-	
-	
-	
-	
-	return 0;
+	return 1;
+
 }
 
