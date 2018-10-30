@@ -22,6 +22,7 @@ typedef struct CallListNode{
 CallListNode callList[] = 
 {
 	{"md5", md5Universal},
+	{"sha1", sha1Universal},
 	{"sha224", sha224Universal},
 	{"sha256", sha256Universal},
 	{"sha384", sha384Universal},

@@ -209,17 +209,46 @@ void sha256Tail(Sha256State* state,void* data, uint8_t currentBytes, uint64_t to
 /* Get the SHA256 value as hex string */
 void sha256Result(Sha256State* state, char* result)
 {
-#if UINT32_MAX == UINT_MAX
-	sprintf(result, "%08x%08x%08x%08x%08x%08x%08x%08x",
-			state->A, state->B, state->C, state->D,
-			state->E, state->F, state->G, state->H);
-#elif UINT32_MAX == ULONG_MAX
-	sprintf(result, "%08lx%08lx%08lx%08lx%08lx%08lx%08lx%08lx",
-			state->A, state->B, state->C, state->D,
-			state->E, state->F, state->G, state->H);
-#else
-	#error uint32_t is not unsigned int or unsigned long in current compiler.
-#endif
+sprintf(result, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+			(uint8_t)(state->A>>24),
+			(uint8_t)(state->A>>16),
+			(uint8_t)(state->A>>8),
+			(uint8_t)(state->A),
+			
+			(uint8_t)(state->B>>24),
+			(uint8_t)(state->B>>16),
+			(uint8_t)(state->B>>8),
+			(uint8_t)(state->B),
+			
+			(uint8_t)(state->C>>24),
+			(uint8_t)(state->C>>16),
+			(uint8_t)(state->C>>8),
+			(uint8_t)(state->C),
+			
+			(uint8_t)(state->D>>24),
+			(uint8_t)(state->D>>16),
+			(uint8_t)(state->D>>8),
+			(uint8_t)(state->D),
+			
+			(uint8_t)(state->E>>24),
+			(uint8_t)(state->E>>16),
+			(uint8_t)(state->E>>8),
+			(uint8_t)(state->E),
+			
+			(uint8_t)(state->F>>24),
+			(uint8_t)(state->F>>16),
+			(uint8_t)(state->F>>8),
+			(uint8_t)(state->F),
+			
+			(uint8_t)(state->G>>24),
+			(uint8_t)(state->G>>16),
+			(uint8_t)(state->G>>8),
+			(uint8_t)(state->G),
+			
+			(uint8_t)(state->H>>24),
+			(uint8_t)(state->H>>16),
+			(uint8_t)(state->H>>8),
+			(uint8_t)(state->H));
 }
 
 
@@ -278,17 +307,41 @@ void sha224Init( Sha256State* state)
 /* Get the SHA224 value as hex string */
 void sha224Result( Sha224State* state, char* result)
 {
-#if UINT32_MAX == UINT_MAX
-	sprintf(result, "%08x%08x%08x%08x%08x%08x%08x",
-			state->A, state->B, state->C, state->D, 
-			state->E, state->F, state->G);
-#elif UINT32_MAX == ULONG_MAX
-	sprintf(result, "%08x%08x%08x%08x%08x%08x%08x",
-			state->A, state->B, state->C, state->D, 
-			state->E, state->F, state->G);
-#else
-	#error uint32_t is not unsigned int or unsigned long in current compiler.
-#endif
+sprintf(result, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+			(uint8_t)(state->A>>24),
+			(uint8_t)(state->A>>16),
+			(uint8_t)(state->A>>8),
+			(uint8_t)(state->A),
+			
+			(uint8_t)(state->B>>24),
+			(uint8_t)(state->B>>16),
+			(uint8_t)(state->B>>8),
+			(uint8_t)(state->B),
+			
+			(uint8_t)(state->C>>24),
+			(uint8_t)(state->C>>16),
+			(uint8_t)(state->C>>8),
+			(uint8_t)(state->C),
+			
+			(uint8_t)(state->D>>24),
+			(uint8_t)(state->D>>16),
+			(uint8_t)(state->D>>8),
+			(uint8_t)(state->D),
+			
+			(uint8_t)(state->E>>24),
+			(uint8_t)(state->E>>16),
+			(uint8_t)(state->E>>8),
+			(uint8_t)(state->E),
+			
+			(uint8_t)(state->F>>24),
+			(uint8_t)(state->F>>16),
+			(uint8_t)(state->F>>8),
+			(uint8_t)(state->F),
+			
+			(uint8_t)(state->G>>24),
+			(uint8_t)(state->G>>16),
+			(uint8_t)(state->G>>8),
+			(uint8_t)(state->G));
 }
 
 /* SHA224 of memory data */
@@ -470,17 +523,85 @@ void sha512Tail(Sha512State* state,void* data, uint8_t currentBytes, uint64_t to
 /* Get the SHA512 value as hex string */
 void sha512Result(Sha512State* state, char* result)
 {
-#if UINT64_MAX == ULONG_MAX
-	sprintf(result, "%016lx%016lx%016lx%016lx%016lx%016lx%016lx%016lx",
-			state->A, state->B, state->C, state->D,
-			state->E, state->F, state->G, state->H);
-#elif UINT64_MAX == ULLONG_MAX
-	sprintf(result, "%016llx%016llx%016llx%016llx%016llx%016llx%016llx%016llx",
-			state->A, state->B, state->C, state->D,
-			state->E, state->F, state->G, state->H);
-#else
-	#error uint64_t is not unsigned long or unsigned long long in current compiler.
-#endif
+	sprintf(result, "%02x%02x%02x%02x%02x%02x%02x%02x"
+					"%02x%02x%02x%02x%02x%02x%02x%02x"
+					"%02x%02x%02x%02x%02x%02x%02x%02x"
+					"%02x%02x%02x%02x%02x%02x%02x%02x"
+					"%02x%02x%02x%02x%02x%02x%02x%02x"
+					"%02x%02x%02x%02x%02x%02x%02x%02x"
+					"%02x%02x%02x%02x%02x%02x%02x%02x"
+					"%02x%02x%02x%02x%02x%02x%02x%02x",
+			(uint8_t)(state->A>>56),
+			(uint8_t)(state->A>>48),
+			(uint8_t)(state->A>>40),
+			(uint8_t)(state->A>>32),
+			(uint8_t)(state->A>>24),
+			(uint8_t)(state->A>>16),
+			(uint8_t)(state->A>>8),
+			(uint8_t)(state->A),
+			
+			(uint8_t)(state->B>>56),
+			(uint8_t)(state->B>>48),
+			(uint8_t)(state->B>>40),
+			(uint8_t)(state->B>>32),
+			(uint8_t)(state->B>>24),
+			(uint8_t)(state->B>>16),
+			(uint8_t)(state->B>>8),
+			(uint8_t)(state->B),
+			
+			(uint8_t)(state->C>>56),
+			(uint8_t)(state->C>>48),
+			(uint8_t)(state->C>>40),
+			(uint8_t)(state->C>>32),
+			(uint8_t)(state->C>>24),
+			(uint8_t)(state->C>>16),
+			(uint8_t)(state->C>>8),
+			(uint8_t)(state->C),
+			
+			(uint8_t)(state->D>>56),
+			(uint8_t)(state->D>>48),
+			(uint8_t)(state->D>>40),
+			(uint8_t)(state->D>>32),
+			(uint8_t)(state->D>>24),
+			(uint8_t)(state->D>>16),
+			(uint8_t)(state->D>>8),
+			(uint8_t)(state->D),
+			
+			(uint8_t)(state->E>>56),
+			(uint8_t)(state->E>>48),
+			(uint8_t)(state->E>>40),
+			(uint8_t)(state->E>>32),
+			(uint8_t)(state->E>>24),
+			(uint8_t)(state->E>>16),
+			(uint8_t)(state->E>>8),
+			(uint8_t)(state->E),
+			
+			(uint8_t)(state->F>>56),
+			(uint8_t)(state->F>>48),
+			(uint8_t)(state->F>>40),
+			(uint8_t)(state->F>>32),
+			(uint8_t)(state->F>>24),
+			(uint8_t)(state->F>>16),
+			(uint8_t)(state->F>>8),
+			(uint8_t)(state->F),
+			
+			(uint8_t)(state->G>>56),
+			(uint8_t)(state->G>>48),
+			(uint8_t)(state->G>>40),
+			(uint8_t)(state->G>>32),
+			(uint8_t)(state->G>>24),
+			(uint8_t)(state->G>>16),
+			(uint8_t)(state->G>>8),
+			(uint8_t)(state->G),
+			
+			(uint8_t)(state->H>>56),
+			(uint8_t)(state->H>>48),
+			(uint8_t)(state->H>>40),
+			(uint8_t)(state->H>>32),
+			(uint8_t)(state->H>>24),
+			(uint8_t)(state->H>>16),
+			(uint8_t)(state->H>>8),
+			(uint8_t)(state->H));
 }
 
 /* SHA512 of memory data */
@@ -559,13 +680,65 @@ void sha384Init(Sha384State* state)
 /* Get the SHA384 value as hex string */
 void sha384Result(Sha384State* state, char* result)
 {
-#if UINT64_MAX == ULONG_MAX
-	sprintf(result,"%016lx%016lx%016lx%016lx%016lx%016lx",state->A,state->B,state->C,state->D,state->E,state->F);
-#elif UINT64_MAX == ULLONG_MAX
-	sprintf(result,"%016llx%016llx%016llx%016llx%016llx%016llx",state->A,state->B,state->C,state->D,state->E,state->F);
-#else
-	#error uint64_t is not unsigned long or unsigned long long in current compiler.
-#endif
+	sprintf(result, "%02x%02x%02x%02x%02x%02x%02x%02x"
+					"%02x%02x%02x%02x%02x%02x%02x%02x"
+					"%02x%02x%02x%02x%02x%02x%02x%02x"
+					"%02x%02x%02x%02x%02x%02x%02x%02x"
+					"%02x%02x%02x%02x%02x%02x%02x%02x"
+					"%02x%02x%02x%02x%02x%02x%02x%02x",
+			(uint8_t)(state->A>>56),
+			(uint8_t)(state->A>>48),
+			(uint8_t)(state->A>>40),
+			(uint8_t)(state->A>>32),
+			(uint8_t)(state->A>>24),
+			(uint8_t)(state->A>>16),
+			(uint8_t)(state->A>>8),
+			(uint8_t)(state->A),
+			
+			(uint8_t)(state->B>>56),
+			(uint8_t)(state->B>>48),
+			(uint8_t)(state->B>>40),
+			(uint8_t)(state->B>>32),
+			(uint8_t)(state->B>>24),
+			(uint8_t)(state->B>>16),
+			(uint8_t)(state->B>>8),
+			(uint8_t)(state->B),
+			
+			(uint8_t)(state->C>>56),
+			(uint8_t)(state->C>>48),
+			(uint8_t)(state->C>>40),
+			(uint8_t)(state->C>>32),
+			(uint8_t)(state->C>>24),
+			(uint8_t)(state->C>>16),
+			(uint8_t)(state->C>>8),
+			(uint8_t)(state->C),
+			
+			(uint8_t)(state->D>>56),
+			(uint8_t)(state->D>>48),
+			(uint8_t)(state->D>>40),
+			(uint8_t)(state->D>>32),
+			(uint8_t)(state->D>>24),
+			(uint8_t)(state->D>>16),
+			(uint8_t)(state->D>>8),
+			(uint8_t)(state->D),
+			
+			(uint8_t)(state->E>>56),
+			(uint8_t)(state->E>>48),
+			(uint8_t)(state->E>>40),
+			(uint8_t)(state->E>>32),
+			(uint8_t)(state->E>>24),
+			(uint8_t)(state->E>>16),
+			(uint8_t)(state->E>>8),
+			(uint8_t)(state->E),
+			
+			(uint8_t)(state->F>>56),
+			(uint8_t)(state->F>>48),
+			(uint8_t)(state->F>>40),
+			(uint8_t)(state->F>>32),
+			(uint8_t)(state->F>>24),
+			(uint8_t)(state->F>>16),
+			(uint8_t)(state->F>>8),
+			(uint8_t)(state->F));
 }
 
 /* SHA384 of memory data */

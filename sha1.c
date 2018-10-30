@@ -169,13 +169,31 @@ void sha1Tail(Sha1State* state, void* data, uint8_t currentBytes, uint64_t total
 /* Get the result as hex string */
 void sha1Result(Sha1State* state, char* result)
 {
-#if UINT32_MAX == UINT_MAX
-	sprintf(result, "%08x%08x%08x%08x%08x",state->A,state->B,state->C,state->D,state->E);
-#elif UINT32_MAX == ULONG_MAX
-	sprintf(result, "%08lx%08lx%08lx%08lx%08lx",state->A,state->B,state->C,state->D,state->E);
-#else
-	#error uint32_t is not unsigned int or unsigned long in current compiler.
-#endif
+	sprintf(result, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
+			(uint8_t)(state->A>>24),
+			(uint8_t)(state->A>>16),
+			(uint8_t)(state->A>>8),
+			(uint8_t)(state->A),
+			
+			(uint8_t)(state->B>>24),
+			(uint8_t)(state->B>>16),
+			(uint8_t)(state->B>>8),
+			(uint8_t)(state->B),
+			
+			(uint8_t)(state->C>>24),
+			(uint8_t)(state->C>>16),
+			(uint8_t)(state->C>>8),
+			(uint8_t)(state->C),
+			
+			(uint8_t)(state->D>>24),
+			(uint8_t)(state->D>>16),
+			(uint8_t)(state->D>>8),
+			(uint8_t)(state->D),
+			
+			(uint8_t)(state->E>>24),
+			(uint8_t)(state->E>>16),
+			(uint8_t)(state->E>>8),
+			(uint8_t)(state->E));
 }
 
 
