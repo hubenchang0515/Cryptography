@@ -3,9 +3,7 @@ A simple cryptography hash functions library of C programming luanguage.
 
 ## Note
 * Callback function shouldn't meet exception , will be fixed.
-* Hasn't been tested in big-endian machine.
-* Complier's ``uint32_t`` should be ``unsigned int`` or ``unsigned long``.
-* Compiler's ``uint64_t`` should be ``unsigned long`` or ``unsigned long long``.
+* It should support little-endian and big-endian BUT hasn't been tested in big-endian machine.
 * May need ``-fno-strict-aliasing`` compiling option.
 
 ## API Index
