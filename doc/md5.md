@@ -8,27 +8,29 @@ MD5 in littel-endian machine
 void md5(const void* data,size_t len, char* result);
 ```
 Calculate MD5 value of memory data.
-* Parameter data is the data to calculate.
-* Parameter length is length of data.
-* Parameter result will return MD5 value as hex string.
+* Parameter `data` is the data to calculate.
+* Parameter `length` is length of data.
+* Parameter `result` will return MD5 value as hex string.
 
 ### md5Universal
 ```C
 void md5Universal(Md5Callback callback, void* userdata, char* result);
 ```
-Calculate MD5 value of any kind of stream.
-* Parameter callback is used to get data.
-* Parameter userdata will pass to callback. 
-* Parameter result will return the MD5 value as hex string.
+Calculate MD5 value of any kind of stream.  
+* Parameter `callback` is used to get data.  
+* Parameter `userdata` will pass to callback.   
+* Parameter `result` will return the MD5 value as hex string.  
 
 ### Md5Callback
 ```C
 typedef int (*Md5Callback)(void* userdata, size_t length, void* data);
 ```
-Parameter userdata is passed from function md5Universal.
-Parameter length means how many bytes of data want to get.
-Parameter data will return the data.
-This callback function will return the true length of gotten data.
+* Parameter `userdata` is passed from function `md5Universal`.  
+* Parameter `length` means how many bytes of data want to get.  
+* Parameter `data` should return the data.  
+* Return value should be true length of `data`.  
+  * if return value equal to parameter `length` , `md5Universal` will continue to calculate.
+  * if return value less than parameter `length` , `md5Universal` will give the result.
 
 
 
