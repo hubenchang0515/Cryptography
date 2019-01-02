@@ -2,9 +2,17 @@
 A simple cryptography hash functions library of C programming luanguage.
 
 ## Note
+* Suggest using `-O3` compiler optimization. 
 * Callback function shouldn't meet exception , will be fixed.
 * It should support little-endian and big-endian BUT hasn't been tested in big-endian machine.
 * May need ``-fno-strict-aliasing`` compiling option.
+
+## Usage
+```
+Usage   : crypto [md5|sha1|sha224|sha256|sha384|sha512] <file>
+Example : crypto md5 text.txt
+          crypto sha256 text.txt
+```
 
 ## API Index
 [MD5](doc/md5.md)  
