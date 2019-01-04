@@ -7,6 +7,12 @@ A simple cryptography hash functions library of C programming luanguage.
 * It should support little-endian and big-endian BUT hasn't been tested in big-endian machine.
 * May need ``-fno-strict-aliasing`` compiling option.
 
+## Build
+```bash
+make
+```
+* copy `crypto` to your PATH.
+
 ## Usage
 ```
 Usage   : crypto [md5|sha1|sha224|sha256|sha384|sha512] <file>
