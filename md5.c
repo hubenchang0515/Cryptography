@@ -271,4 +271,74 @@ void md5Universal(Md5Callback callback, void* userdata, char* result)
 }
 
 
+/* Reset Md5 */
+void md5Reset(Md5* md5)
+{
+	md5Init(&(md5->state));
+	md5->length = 0;
+	md5->used = 0;
+	md5->hex[0] = 0;
+}
 
+/* Add data into Md5State autoly */
+void md5Update(Md5* md5, const void* data, size_t length)
+{
+	/* Forgot reset */
+	if(md5->hex[0] != 0)
+	{
+		md5Reset(md5);
+	}
+
+	size_t need = 64 - md5->used;
+	while(length > need)
+	{
+		void* p = md5->buffer + md5->used;
+		memcpy(p, data, need);
+		md5Count(&(md5->state), md5->buffer);
+		md5->length += 64;
+		md5->used = 0;
+
+		data += need;
+		length -= need;
+		need = 64;
+	}
+
+	void* p = md5->buffer + md5->used;
+	memcpy(p, data, length);
+	md5->used += length;
+	// not md5->length += length , because didn't md5Count
+}
+
+
+/* Get the hex */
+const char* md5Hex(Md5* md5)
+{
+	/* Invoke repeatedly */
+	if(md5->hex[0] != 0)
+	{
+		return md5->hex;
+	}
+
+	if(md5->used == 64)
+	{
+		md5Count(&(md5->state), md5->buffer);
+		md5->length += 64;
+		md5->used = 0;
+	}
+
+	md5Tail(&(md5->state), md5->buffer, md5->used, md5->length + md5->used);
+	md5Result(&(md5->state), md5->hex);
+	return (const char*)(md5->hex);
+}
+
+const char* md5Data(Md5* md5, const void* data, size_t length)
+{
+	md5Reset(md5);
+	md5Update(md5, data, length);
+	return md5Hex(md5);
+}
+
+const char* md5String(Md5* md5, const char* str)
+{
+	return md5Data(md5, (const void*)(str), strlen(str));
+}
