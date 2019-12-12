@@ -798,3 +798,306 @@ void sha384Universal(Sha384Callback callback, void* userdata, char* result)
 }
 
 /* SHA384 END */
+
+
+/* Reset Sha256 */
+void sha256Reset(Sha256* sha256)
+{
+	sha256Init(&(sha256->state));
+	sha256->length = 0;
+	sha256->used = 0;
+	sha256->hex[0] = 0;
+}
+
+/* Add data into Sha256State autoly */
+void sha256Update(Sha256* sha256, const void* data, size_t length)
+{
+	/* Forgot reset */
+	if(sha256->hex[0] != 0)
+	{
+		sha256Reset(sha256);
+	}
+
+	size_t need = 64 - sha256->used;
+	while(length > need)
+	{
+		void* p = sha256->buffer + sha256->used;
+		memcpy(p, data, need);
+		sha256Count(&(sha256->state), sha256->buffer);
+		sha256->length += 64;
+		sha256->used = 0;
+
+		data += need;
+		length -= need;
+		need = 64;
+	}
+
+	void* p = sha256->buffer + sha256->used;
+	memcpy(p, data, length);
+	sha256->used += length;
+	// not sha256->length += length , because didn't sha256Count
+}
+
+
+/* Get the hex */
+const char* sha256Hex(Sha256* sha256)
+{
+	/* Invoke repeatedly */
+	if(sha256->hex[0] != 0)
+	{
+		return sha256->hex;
+	}
+
+	sha256->length += sha256->used;
+	sha256Tail(&(sha256->state), sha256->buffer, sha256->used, sha256->length);
+	sha256Result(&(sha256->state), sha256->hex);
+	return (const char*)(sha256->hex);
+}
+
+const char* sha256OfData(Sha256* sha256, const void* data, size_t length)
+{
+	sha256Reset(sha256);
+	sha256Update(sha256, data, length);
+	return sha256Hex(sha256);
+}
+
+const char* sha256OfString(Sha256* sha256, const char* str)
+{
+	return sha256OfData(sha256, (const void*)(str), strlen(str));
+}
+
+/* Reset Sha224 */
+void sha224Reset(Sha224* sha224)
+{
+	sha224Init(&(sha224->state));
+	sha224->length = 0;
+	sha224->used = 0;
+	sha224->hex[0] = 0;
+}
+
+/* Add data into Sha224State autoly */
+void sha224Update(Sha224* sha224, const void* data, size_t length)
+{
+	/* Forgot reset */
+	if(sha224->hex[0] != 0)
+	{
+		sha224Reset(sha224);
+	}
+
+	size_t need = 64 - sha224->used;
+	while(length > need)
+	{
+		void* p = sha224->buffer + sha224->used;
+		memcpy(p, data, need);
+		sha224Count(&(sha224->state), sha224->buffer);
+		sha224->length += 64;
+		sha224->used = 0;
+
+		data += need;
+		length -= need;
+		need = 64;
+	}
+
+	void* p = sha224->buffer + sha224->used;
+	memcpy(p, data, length);
+	sha224->used += length;
+	// not sha224->length += length , because didn't sha224Count
+}
+
+
+/* Get the hex */
+const char* sha224Hex(Sha224* sha224)
+{
+	/* Invoke repeatedly */
+	if(sha224->hex[0] != 0)
+	{
+		return sha224->hex;
+	}
+
+	sha224->length += sha224->used;
+	sha224Tail(&(sha224->state), sha224->buffer, sha224->used, sha224->length);
+	sha224Result(&(sha224->state), sha224->hex);
+	return (const char*)(sha224->hex);
+}
+
+const char* sha224OfData(Sha224* sha224, const void* data, size_t length)
+{
+	sha224Reset(sha224);
+	sha224Update(sha224, data, length);
+	return sha224Hex(sha224);
+}
+
+const char* sha224OfString(Sha224* sha224, const char* str)
+{
+	return sha224OfData(sha224, (const void*)(str), strlen(str));
+}
+
+
+/* Reset Sha512 */
+void sha512Reset(Sha512* sha512)
+{
+	sha512Init(&(sha512->state));
+	sha512->length_low = 0;
+	sha512->length_high = 0;
+	sha512->used = 0;
+	sha512->hex[0] = 0;
+}
+
+/* Add data into Sha512State autoly */
+void sha512Update(Sha512* sha512, const void* data, size_t length)
+{
+	/* Forgot reset */
+	if(sha512->hex[0] != 0)
+	{
+		sha512Reset(sha512);
+	}
+
+	size_t need = 128 - sha512->used;
+	while(length > need)
+	{
+		void* p = sha512->buffer + sha512->used;
+		memcpy(p, data, need);
+		sha512Count(&(sha512->state), sha512->buffer);
+		sha512->used = 0;
+		if(sha512->length_low <= (UINT64_MAX - 128))
+		{
+			sha512->length_low += 128;
+		}
+		else
+		{
+			sha512->length_high += 1;
+			sha512->length_low += 128;
+		}
+
+		data += need;
+		length -= need;
+		need = 128;
+	}
+
+	void* p = sha512->buffer + sha512->used;
+	memcpy(p, data, length);
+	sha512->used += length;
+	// not sha512->length += length , because didn't sha512Count
+}
+
+
+/* Get the hex */
+const char* sha512Hex(Sha512* sha512)
+{
+	/* Invoke repeatedly */
+	if(sha512->hex[0] != 0)
+	{
+		return sha512->hex;
+	}
+
+	if(sha512->length_low <= (UINT64_MAX - sha512->used))
+	{
+		sha512->length_low += sha512->used;
+	}
+	else
+	{
+		sha512->length_high += 1;
+		sha512->length_low += sha512->used;
+	}
+
+	sha512Tail(&(sha512->state), sha512->buffer, sha512->used, sha512->length_low, sha512->length_high);
+	sha512Result(&(sha512->state), sha512->hex);
+	return (const char*)(sha512->hex);
+}
+
+const char* sha512OfData(Sha512* sha512, const void* data, size_t length)
+{
+	sha512Reset(sha512);
+	sha512Update(sha512, data, length);
+	return sha512Hex(sha512);
+}
+
+const char* sha512OfString(Sha512* sha512, const char* str)
+{
+	return sha512OfData(sha512, (const void*)(str), strlen(str));
+}
+
+
+/* Reset Sha384 */
+void sha384Reset(Sha384* sha384)
+{
+	sha384Init(&(sha384->state));
+	sha384->length_low = 0;
+	sha384->length_high = 0;
+	sha384->used = 0;
+	sha384->hex[0] = 0;
+}
+
+/* Add data into Sha384State autoly */
+void sha384Update(Sha384* sha384, const void* data, size_t length)
+{
+	/* Forgot reset */
+	if(sha384->hex[0] != 0)
+	{
+		sha384Reset(sha384);
+	}
+
+	size_t need = 128 - sha384->used;
+	while(length > need)
+	{
+		void* p = sha384->buffer + sha384->used;
+		memcpy(p, data, need);
+		sha384Count(&(sha384->state), sha384->buffer);
+		sha384->used = 0;
+		if(sha384->length_low <= (UINT64_MAX - 128))
+		{
+			sha384->length_low += 128;
+		}
+		else
+		{
+			sha384->length_high += 1;
+			sha384->length_low += 128;
+		}
+
+		data += need;
+		length -= need;
+		need = 128;
+	}
+
+	void* p = sha384->buffer + sha384->used;
+	memcpy(p, data, length);
+	sha384->used += length;
+	// not sha384->length += length , because didn't sha384Count
+}
+
+
+/* Get the hex */
+const char* sha384Hex(Sha384* sha384)
+{
+	/* Invoke repeatedly */
+	if(sha384->hex[0] != 0)
+	{
+		return sha384->hex;
+	}
+
+	if(sha384->length_low <= (UINT64_MAX - sha384->used))
+	{
+		sha384->length_low += sha384->used;
+	}
+	else
+	{
+		sha384->length_high += 1;
+		sha384->length_low += sha384->used;
+	}
+
+	sha384Tail(&(sha384->state), sha384->buffer, sha384->used, sha384->length_low, sha384->length_high);
+	sha384Result(&(sha384->state), sha384->hex);
+	return (const char*)(sha384->hex);
+}
+
+const char* sha384OfData(Sha384* sha384, const void* data, size_t length)
+{
+	sha384Reset(sha384);
+	sha384Update(sha384, data, length);
+	return sha384Hex(sha384);
+}
+
+const char* sha384OfString(Sha384* sha384, const char* str)
+{
+	return sha384OfData(sha384, (const void*)(str), strlen(str));
+}

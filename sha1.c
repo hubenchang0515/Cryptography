@@ -233,3 +233,70 @@ void sha1Universal(Sha1Callback callback, void* userdata, char* result)
 	sha1Tail(&state, data, currentSize, totalSize);
 	sha1Result(&state, result);
 }
+
+
+/* Reset Sha1 */
+void sha1Reset(Sha1* sha1)
+{
+	sha1Init(&(sha1->state));
+	sha1->length = 0;
+	sha1->used = 0;
+	sha1->hex[0] = 0;
+}
+
+/* Add data into Sha1State autoly */
+void sha1Update(Sha1* sha1, const void* data, size_t length)
+{
+	/* Forgot reset */
+	if(sha1->hex[0] != 0)
+	{
+		sha1Reset(sha1);
+	}
+
+	size_t need = 64 - sha1->used;
+	while(length > need)
+	{
+		void* p = sha1->buffer + sha1->used;
+		memcpy(p, data, need);
+		sha1Count(&(sha1->state), sha1->buffer);
+		sha1->length += 64;
+		sha1->used = 0;
+
+		data += need;
+		length -= need;
+		need = 64;
+	}
+
+	void* p = sha1->buffer + sha1->used;
+	memcpy(p, data, length);
+	sha1->used += length;
+	// not sha1->length += length , because didn't sha1Count
+}
+
+
+/* Get the hex */
+const char* sha1Hex(Sha1* sha1)
+{
+	/* Invoke repeatedly */
+	if(sha1->hex[0] != 0)
+	{
+		return sha1->hex;
+	}
+
+	sha1->length += sha1->used;
+	sha1Tail(&(sha1->state), sha1->buffer, sha1->used, sha1->length);
+	sha1Result(&(sha1->state), sha1->hex);
+	return (const char*)(sha1->hex);
+}
+
+const char* sha1OfData(Sha1* sha1, const void* data, size_t length)
+{
+	sha1Reset(sha1);
+	sha1Update(sha1, data, length);
+	return sha1Hex(sha1);
+}
+
+const char* sha1OfString(Sha1* sha1, const char* str)
+{
+	return sha1OfData(sha1, (const void*)(str), strlen(str));
+}

@@ -8,6 +8,7 @@
 	extern "C" {
 #endif
 
+/* Old Interface */
 typedef struct Sha1State
 {
 	uint32_t A;
@@ -27,6 +28,23 @@ void sha1(const void* data, size_t length, char* result);
 
 typedef int (*Sha1Callback)(void* userdata, size_t length, void* data);
 void sha1Universal(Sha1Callback callback, void* userdata, char* result);
+
+/* New Interface */
+typedef struct Sha1
+{
+	Sha1State state;
+	
+	char hex[41];                // sha1 result hex sum
+	uint8_t buffer[64];          // buffer
+	size_t used;                 // length of buffer used
+	size_t length;               // length of total data
+}Sha1;
+
+void sha1Reset(Sha1* sha1);
+void sha1Update(Sha1* sha1, const void* data, size_t length);
+const char* sha1Hex(Sha1* sha1);
+const char* sha1OfData(Sha1* sha1, const void* data, size_t length);
+const char* sha1OfString(Sha1* sha1, const char* str);
 
 #ifdef __cplusplus
 	}

@@ -319,26 +319,20 @@ const char* md5Hex(Md5* md5)
 		return md5->hex;
 	}
 
-	if(md5->used == 64)
-	{
-		md5Count(&(md5->state), md5->buffer);
-		md5->length += 64;
-		md5->used = 0;
-	}
-
-	md5Tail(&(md5->state), md5->buffer, md5->used, md5->length + md5->used);
+	md5->length += md5->used;
+	md5Tail(&(md5->state), md5->buffer, md5->used, md5->length);
 	md5Result(&(md5->state), md5->hex);
 	return (const char*)(md5->hex);
 }
 
-const char* md5Data(Md5* md5, const void* data, size_t length)
+const char* md5OfData(Md5* md5, const void* data, size_t length)
 {
 	md5Reset(md5);
 	md5Update(md5, data, length);
 	return md5Hex(md5);
 }
 
-const char* md5String(Md5* md5, const char* str)
+const char* md5OfString(Md5* md5, const char* str)
 {
-	return md5Data(md5, (const void*)(str), strlen(str));
+	return md5OfData(md5, (const void*)(str), strlen(str));
 }
