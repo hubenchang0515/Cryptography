@@ -1,82 +1,47 @@
 # SHA1
 SHA1 in littel-endian machine
 
-# API
-
-### sha1
+## API
 ```C
-void sha1(const void* data, size_t length, char* result);
-```
-Calculate SHA1 value of memory data.
-* Parameter `data` is the data to calculate.
-* Parameter `length` is length of data.
-* Parameter `result` will return SHA1 value as hex string.
+/* Reset */
+void sha1Reset(Sha1* sha1);
 
-### sha1Universal
-```C
-void sha1Universal(Sha1Callback callback, void* userdata, char* result);
-```
-Calculate SHA1 value of any kind of stream.
-* Parameter `callback` is used to get data.
-* Parameter `userdata` will pass to callback. 
-* Parameter `result` will return the SHA1 value as hex string.
+/* Add data */
+void sha1Update(Sha1* sha1, const void* data, size_t length);
 
+/* Get the result */
+const char* sha1Hex(Sha1* sha1);
 
-### Sha1Callback
-```C
-typedef int (*Sha1Callback)(void* userdata, size_t length, void* data);
+/* Convenient method to calculate SHA1 of data */
+const char* sha1OfData(Sha1* sha1, const void* data, size_t length);
+
+/* Convenient method to calculate SHA1 of C-style string */
+const char* sha1OfString(Sha1* sha1, const char* str);
 ```
-* Parameter `userdata` is passed from function `sha1Universal`.  
-* Parameter `length` means how many bytes of data want to get.  
-* Parameter `data` should return the data.  
-* Return value should be true length of `data`.  
-  * if return value equal to parameter `length` , `sha1Universal` will continue to calculate.
-  * if return value less than parameter `length` , `sha1Universal` will give the result.
 
 ## Demo
 
-### Calculate the SHA1 of short string
 ```C
 #include <stdio.h>
 #include <string.h>
 #include "sha1.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-	char data[] = "https://github.com/hubenchang0515/Cryptography";
-	char sha1Value[41];
-	sha1(data, strlen(data), sha1Value);
-	printf("%s\n",sha1Value);
-	return 0;
-}
-```
+	FILE* fp = fopen(argv[1], "rb");
 
-### Calculate the SHA1 of big file
-```C
-#include <stdio.h>
-#include "sha1.h"
-
-/* Sha1Callback */
-int getData(void* fp,size_t length, void* data)
-{
-	return fread(data,1,length,(FILE*)fp);
-}
-
-int main()
-{	
-	FILE* fp = fopen("C++ Primer.pdf","rb"); // about 208MB
-	if(fp == NULL)
+	/* Calculate SHA1 */
+	Sha1 sha1;
+	sha1Reset(&sha1); // reset
+	int bytes = 0;
+	char data[4096];
+	while((bytes = fread(data, 1, 4096, fp)) > 0)
 	{
-		printf("Open file failed.\n");
-		return 1;
+		sha1Update(&sha1, data, bytes); // add data
 	}
-	char sha1Hex[41];
-	sha1Universal(getData, fp, sha1Hex);
+	printf("%s\n", sha1Hex(&sha1)); // get the result
+
 	fclose(fp);
-	
-	printf("%s\n",sha1Hex);
-	
 	return 0;
 }
 ```
-

@@ -2,82 +2,46 @@
 MD5 in littel-endian machine
 
 ## API
-
-### md5
 ```C
-void md5(const void* data,size_t len, char* result);
+/* Reset */
+void md5Reset(Md5* md5);
+
+/* Add data */
+void md5Update(Md5* md5, const void* data, size_t length);
+
+/* Get the result */
+const char* md5Hex(Md5* md5);
+
+/* Convenient method to calculate MD5 of data */
+const char* md5OfData(Md5* md5, const void* data, size_t length);
+
+/* Convenient method to calculate MD5 of C-style string */
+const char* md5OfString(Md5* md5, const char* str);
 ```
-Calculate MD5 value of memory data.
-* Parameter `data` is the data to calculate.
-* Parameter `length` is length of data.
-* Parameter `result` will return MD5 value as hex string.
-
-### md5Universal
-```C
-void md5Universal(Md5Callback callback, void* userdata, char* result);
-```
-Calculate MD5 value of any kind of stream.  
-* Parameter `callback` is used to get data.  
-* Parameter `userdata` will pass to callback.   
-* Parameter `result` will return the MD5 value as hex string.  
-
-### Md5Callback
-```C
-typedef int (*Md5Callback)(void* userdata, size_t length, void* data);
-```
-* Parameter `userdata` is passed from function `md5Universal`.  
-* Parameter `length` means how many bytes of data want to get.  
-* Parameter `data` should return the data.  
-* Return value should be true length of `data`.  
-  * if return value equal to parameter `length` , `md5Universal` will continue to calculate.
-  * if return value less than parameter `length` , `md5Universal` will give the result.
-
-
 
 ## Demo
 
-### Calculate the MD5 of short string
 ```C
 #include <stdio.h>
 #include <string.h>
 #include "md5.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-	char data[] = "https://github.com/hubenchang0515/Cryptography";
-	char md5Value[33];
-	md5(data, strlen(data), md5Value);
-	printf("%s\n",md5Value);
-	return 0;
-}
-```
+	FILE* fp = fopen(argv[1], "rb");
 
-### Calculate the SHA1 of big file
-```C
-#include <stdio.h>
-#include "md5.h"
-
-/* Md5Callback */
-int getData(void* fp, size_t length, void* data)
-{
-	return fread(data,1,length,(FILE*)fp);
-}
-
-int main()
-{	
-	FILE* fp = fopen("C++ Primer.pdf","rb"); // about 208MB
-	if(fp == NULL)
+	/* Calculate MD5 */
+	Md5 md5;
+	md5Reset(&md5); // reset
+	int bytes = 0;
+	char data[4096];
+	while((bytes = fread(data, 1, 4096, fp)) > 0)
 	{
-		printf("Open file failed.\n");
-		return 1;
+		md5Update(&md5, data, bytes); // add data
 	}
-	char md5Hex[33];
-	md5Universal(getData, fp, md5Hex);
+	printf("%s\n", md5Hex(&md5)); // get the result
+
 	fclose(fp);
-	
-	printf("%s\n",md5Hex);
-	
 	return 0;
 }
 ```
-
