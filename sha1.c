@@ -254,7 +254,7 @@ void sha1Update(Sha1* sha1, const void* data, size_t length)
 	}
 
 	size_t need = 64 - sha1->used;
-	while(length > need)
+	while(length >= need)
 	{
 		void* p = sha1->buffer + sha1->used;
 		memcpy(p, data, need);

@@ -290,7 +290,7 @@ void md5Update(Md5* md5, const void* data, size_t length)
 	}
 
 	size_t need = 64 - md5->used;
-	while(length > need)
+	while(length >= need)
 	{
 		void* p = md5->buffer + md5->used;
 		memcpy(p, data, need);

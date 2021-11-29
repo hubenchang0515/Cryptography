@@ -819,7 +819,7 @@ void sha256Update(Sha256* sha256, const void* data, size_t length)
 	}
 
 	size_t need = 64 - sha256->used;
-	while(length > need)
+	while(length >= need)
 	{
 		void* p = sha256->buffer + sha256->used;
 		memcpy(p, data, need);
@@ -885,7 +885,7 @@ void sha224Update(Sha224* sha224, const void* data, size_t length)
 	}
 
 	size_t need = 64 - sha224->used;
-	while(length > need)
+	while(length >= need)
 	{
 		void* p = sha224->buffer + sha224->used;
 		memcpy(p, data, need);
@@ -953,7 +953,7 @@ void sha512Update(Sha512* sha512, const void* data, size_t length)
 	}
 
 	size_t need = 128 - sha512->used;
-	while(length > need)
+	while(length >= need)
 	{
 		void* p = sha512->buffer + sha512->used;
 		memcpy(p, data, need);
@@ -1038,7 +1038,7 @@ void sha384Update(Sha384* sha384, const void* data, size_t length)
 	}
 
 	size_t need = 128 - sha384->used;
-	while(length > need)
+	while(length >= need)
 	{
 		void* p = sha384->buffer + sha384->used;
 		memcpy(p, data, need);
