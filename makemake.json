@@ -1,0 +1,24 @@
+{
+    "targets": [
+        {
+            "name": "crypto",
+            "type": "executable",
+            "cc": "gcc",
+            "cxx": "g++",
+            "cflags": "-W -Wall -O3 -Wno-incompatible-pointer-types",
+            "cxxflags": "-O2 -W -Wall",
+            "ar": "ar",
+            "arflags": "rcs",
+            "libs": "",
+            "install": "",
+            "cmd": "",
+            "sources": [
+                "main.c",
+                "md5.c",
+                "sha1.c",
+                "sha2.c"
+            ],
+            "depends": []
+        }
+    ]
+}
