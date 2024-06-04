@@ -24,7 +24,7 @@ typedef struct  Sha256State
 
 void sha256Init(Sha256State* state);
 void sha256Count(Sha256State* state, const void* data);
-void sha256Tail(Sha256State* state,void* data, uint8_t currentBytes, uint64_t totalBytes);
+void sha256Tail(Sha256State* state,void* data, size_t currentBytes, uint64_t totalBytes);
 void sha256Result(Sha256State* state, char* result);
 
 void sha256(const void* data, size_t length, char* result);
@@ -61,7 +61,7 @@ typedef struct Sha512State
 
 void sha512Init( Sha512State* state);
 void sha512Count( Sha512State* state, const void* data);
-void sha512Tail(Sha512State* state,void* data, uint8_t currentBytes, uint64_t totalBytesL, uint64_t totalBytesH);
+void sha512Tail(Sha512State* state,void* data, size_t currentBytes, uint64_t totalBytesL, uint64_t totalBytesH);
 void sha512Result( Sha512State* state, char* result);
 
 void sha512(const void* data, size_t length, char* result);

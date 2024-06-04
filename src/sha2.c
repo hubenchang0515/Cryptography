@@ -81,14 +81,14 @@ static uint64_t readAsBigEndian64(uint8_t* data)
 
 static void writeAsBigEndian64(uint64_t value, uint8_t* data)
 {
-	data[0] = value >> 56;
-	data[1] = value >> 48;
-	data[2] = value >> 40;
-	data[3] = value >> 32;
-	data[4] = value >> 24;
-	data[5] = value >> 16;
-	data[6] = value >> 8;
-	data[7] = value;
+	data[0] = (uint8_t) (value >> 56);
+	data[1] = (uint8_t) (value >> 48);
+	data[2] = (uint8_t) (value >> 40);
+	data[3] = (uint8_t) (value >> 32);
+	data[4] = (uint8_t) (value >> 24);
+	data[5] = (uint8_t) (value >> 16);
+	data[6] = (uint8_t) (value >> 8);
+	data[7] = (uint8_t) value;
 }
 
 /* SHA256 START */
@@ -177,13 +177,13 @@ void sha256Count(Sha256State* state, const void* data)
 
 
 /* Calculate the last group data */
-void sha256Tail(Sha256State* state,void* data, uint8_t currentBytes, uint64_t totalBytes)
+void sha256Tail(Sha256State* state,void* data, size_t currentBytes, uint64_t totalBytes)
 {
 	/* fill current group data by 1000... */
 	if(currentBytes != 56)
 	{
 		((uint8_t*)data)[currentBytes] = 0x80;
-		for(uint8_t i = currentBytes + 1; i < 64; i++)
+		for(size_t i = currentBytes + 1; i < 64; i++)
 		{
 			((uint8_t*)data)[i] = 0;
 		}
@@ -490,13 +490,13 @@ static void sha512Set128BitsSize(uint8_t* addr, uint64_t totalBytesL, uint64_t t
 }
 
 /* Calculate the last group data */
-void sha512Tail(Sha512State* state,void* data, uint8_t currentBytes, uint64_t totalBytesL, uint64_t totalBytesH)
+void sha512Tail(Sha512State* state,void* data, size_t currentBytes, uint64_t totalBytesL, uint64_t totalBytesH)
 {
 	/* fill current group data by 1000... */
 	if(currentBytes != 112)
 	{
 		((uint8_t*)data)[currentBytes] = 0x80;
-		for(uint8_t i = currentBytes + 1; i < 128; i++)
+		for(size_t i = currentBytes + 1; i < 128; i++)
 		{
 			((uint8_t*)data)[i] = 0;
 		}
@@ -827,7 +827,7 @@ void sha256Update(Sha256* sha256, const void* data, size_t length)
 		sha256->length += 64;
 		sha256->used = 0;
 
-		data += need;
+		data = (uint8_t*) data + need;
 		length -= need;
 		need = 64;
 	}
@@ -893,7 +893,7 @@ void sha224Update(Sha224* sha224, const void* data, size_t length)
 		sha224->length += 64;
 		sha224->used = 0;
 
-		data += need;
+		data = (uint8_t*) data + need;
 		length -= need;
 		need = 64;
 	}
@@ -969,7 +969,7 @@ void sha512Update(Sha512* sha512, const void* data, size_t length)
 			sha512->length_low += 128;
 		}
 
-		data += need;
+		data = (uint8_t*) data + need;
 		length -= need;
 		need = 128;
 	}
@@ -1054,7 +1054,7 @@ void sha384Update(Sha384* sha384, const void* data, size_t length)
 			sha384->length_low += 128;
 		}
 
-		data += need;
+		data = (uint8_t*) data + need;
 		length -= need;
 		need = 128;
 	}

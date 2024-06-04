@@ -19,14 +19,14 @@ static uint32_t readAsLittleEndian32(uint8_t* data)
 
 static void writeAsLittleEndian64(uint64_t value, uint8_t* data)
 {
-	data[0] = value;
-	data[1] = value >> 8;
-	data[2] = value >> 16;
-	data[3] = value >> 24;
-	data[4] = value >> 32;
-	data[5] = value >> 40;
-	data[6] = value >> 48;
-	data[7] = value >> 56;
+	data[0] = (uint8_t) value;
+	data[1] = (uint8_t) (value >> 8);
+	data[2] = (uint8_t) (value >> 16);
+	data[3] = (uint8_t) (value >> 24);
+	data[4] = (uint8_t) (value >> 32);
+	data[5] = (uint8_t) (value >> 40);
+	data[6] = (uint8_t) (value >> 48);
+	data[7] = (uint8_t) (value >> 56);
 }
 
 
@@ -176,13 +176,13 @@ void md5Count(Md5State* state, const void* data)
 
 
 /* Fill the last group and calculate */
-void md5Tail(Md5State* state, void* data, uint8_t currentBytes, uint64_t totalBytes)
+void md5Tail(Md5State* state, void* data, size_t currentBytes, uint64_t totalBytes)
 {
 	/* fill current group data by 1000... */
 	if(currentBytes != 56)
 	{
 		((uint8_t*)data)[currentBytes] = 0x80;
-		for(uint8_t i = currentBytes + 1; i < 64; i++)
+		for(size_t i = currentBytes + 1; i < 64; i++)
 		{
 			((uint8_t*)data)[i] = 0;
 		}
@@ -298,7 +298,7 @@ void md5Update(Md5* md5, const void* data, size_t length)
 		md5->length += 64;
 		md5->used = 0;
 
-		data += need;
+		data = (uint8_t*) data + need;
 		length -= need;
 		need = 64;
 	}

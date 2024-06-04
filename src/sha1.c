@@ -25,14 +25,14 @@ static uint32_t readAsBigEndian32(uint8_t* data)
 
 static void writeAsBigEndian64(uint64_t value, uint8_t* data)
 {
-	data[0] = value >> 56;
-	data[1] = value >> 48;
-	data[2] = value >> 40;
-	data[3] = value >> 32;
-	data[4] = value >> 24;
-	data[5] = value >> 16;
-	data[6] = value >> 8;
-	data[7] = value;
+	data[0] = (uint8_t) (value >> 56);
+	data[1] = (uint8_t) (value >> 48);
+	data[2] = (uint8_t) (value >> 40);
+	data[3] = (uint8_t) (value >> 32);
+	data[4] = (uint8_t) (value >> 24);
+	data[5] = (uint8_t) (value >> 16);
+	data[6] = (uint8_t) (value >> 8);
+	data[7] = (uint8_t) value;
 }
 
 
@@ -135,13 +135,13 @@ void sha1Count(Sha1State* state, const void* data)
 
 
 /* Fill the last group and calculate */
-void sha1Tail(Sha1State* state, void* data, uint8_t currentBytes, uint64_t totalBytes)
+void sha1Tail(Sha1State* state, void* data, size_t currentBytes, uint64_t totalBytes)
 {
 	/* fill current group data by 1000... */
 	if(currentBytes != 56)
 	{
 		((uint8_t*)data)[currentBytes] = 0x80;
-		for(uint8_t i = currentBytes + 1; i < 64; i++)
+		for(size_t i = currentBytes + 1; i < 64; i++)
 		{
 			((uint8_t*)data)[i] = 0;
 		}
@@ -262,7 +262,7 @@ void sha1Update(Sha1* sha1, const void* data, size_t length)
 		sha1->length += 64;
 		sha1->used = 0;
 
-		data += need;
+		data = (uint8_t*) data + need;
 		length -= need;
 		need = 64;
 	}

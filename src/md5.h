@@ -20,7 +20,7 @@ typedef struct Md5State
 
 void md5Init(Md5State* state);
 void md5Count(Md5State* state, const void* data);
-void md5Tail(Md5State* state, void* data, uint8_t currentBytes, uint64_t totalBytes);
+void md5Tail(Md5State* state, void* data, size_t currentBytes, uint64_t totalBytes);
 void md5Result(Md5State* state, char* result);
 
 void md5(const void* data,size_t len, char* result);
