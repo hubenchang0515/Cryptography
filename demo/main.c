@@ -12,23 +12,27 @@ const char* filename(const char* filepath)
 	return p+1;
 }
 
+typedef void (*ResetFunc)(void*);
+typedef void (*UpdateFunc)(void* state, const void* data, size_t length);
+typedef const char* (*HexFunc)(void* state);
+
 typedef struct HashMethod{
 	const char* key;
-	void (*reset)(void* state);
-	void (*update)(void* state, const void* data, size_t length);
-	const char* (*hex)(void* state);
+	ResetFunc reset;
+	UpdateFunc update;
+	HexFunc hex;;
 }HashMethod;
 
 
 /* Options List [gcc -Wno-incompatible-pointer-types] */
 HashMethod methodList[] = 
 {
-	{"md5", md5Reset, md5Update, md5Hex},
-	{"sha1", sha1Reset, sha1Update, sha1Hex},
-	{"sha224", sha224Reset, sha224Update, sha224Hex},
-	{"sha256", sha256Reset, sha256Update, sha256Hex},
-	{"sha384", sha384Reset, sha384Update, sha384Hex},
-	{"sha512", sha512Reset, sha512Update, sha512Hex},
+	{"md5", 	(ResetFunc)md5Reset, 	(UpdateFunc)md5Update, 		(HexFunc)md5Hex},
+	{"sha1", 	(ResetFunc)sha1Reset, 	(UpdateFunc)sha1Update, 	(HexFunc)sha1Hex},
+	{"sha224", 	(ResetFunc)sha224Reset, (UpdateFunc)sha224Update, 	(HexFunc)sha224Hex},
+	{"sha256", 	(ResetFunc)sha256Reset, (UpdateFunc)sha256Update, 	(HexFunc)sha256Hex},
+	{"sha384", 	(ResetFunc)sha384Reset, (UpdateFunc)sha384Update, 	(HexFunc)sha384Hex},
+	{"sha512", 	(ResetFunc)sha512Reset, (UpdateFunc)sha512Update, 	(HexFunc)sha512Hex},
 	{NULL, NULL, NULL, NULL}
 };
 
